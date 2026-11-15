@@ -10,7 +10,7 @@ public final class FractalExportSettings {
         return widthPx;
     }
     public void setWidthPx(int newWidthPx) {
-        widthPx= newWidthPx;
+        widthPx = newWidthPx;
         int gcd = greatestCommonDivisor(widthPx, heightPx);
         aspectRatioWidth = widthPx / gcd;
         aspectRatioHeight = heightPx / gcd;
@@ -31,7 +31,7 @@ public final class FractalExportSettings {
     }
     public void setAspectRatioWidth(int newAspectRatioWidth) {
         aspectRatioWidth = newAspectRatioWidth;
-        widthPx = aspectRatioWidth / aspectRatioHeight / heightPx;
+        setWidthPx(Math.round(aspectRatioWidth * heightPx / aspectRatioHeight));
     }
 
     public int getAspectRatioHeight() {
@@ -39,7 +39,7 @@ public final class FractalExportSettings {
     }
     public void setAspectRatioHeight(int newAspectRatioHeight) {
         aspectRatioHeight = newAspectRatioHeight;
-        heightPx = aspectRatioWidth / aspectRatioHeight / widthPx;
+        setHeightPx(Math.round(widthPx * aspectRatioHeight / aspectRatioWidth));
     }
 
     private static int greatestCommonDivisor(int a, int b) {

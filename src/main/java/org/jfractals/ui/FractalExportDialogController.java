@@ -2,16 +2,19 @@ package org.jfractals.ui;
 
 import java.io.File;
 import java.util.function.IntConsumer;
+import java.util.function.UnaryOperator;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.stage.FileChooser;
 
 public class FractalExportDialogController {
     private final FractalExportSettings settings = new FractalExportSettings();
     private boolean syncingControls;
+    private static final UnaryOperator<TextFormatter.Change> SPINNER_INTEGER_FILTER = change -> change.getControlNewText().matches("\\d{0,6}") ? change : null;
 
     @FXML private TextField exportPathTextField;
     @FXML private Spinner<Integer> widthSpinner;
@@ -21,10 +24,14 @@ public class FractalExportDialogController {
 
     @FXML
     private void initialize() {
-        widthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1920 * 10, 1920));
-        heightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 1080 * 10, 1080));
-        aspectRatioWidthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 16 * 10, 16));
-        aspectRatioHeightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(0, 9 * 10, 9));
+        widthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(100, Integer.MAX_VALUE, 1920));
+        widthSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
+        heightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(100, Integer.MAX_VALUE, 1080));
+        heightSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
+        aspectRatioWidthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 16));
+        aspectRatioWidthSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
+        aspectRatioHeightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 9));
+        aspectRatioHeightSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
 
         connect(widthSpinner, settings::setWidthPx);
         connect(heightSpinner, settings::setHeightPx);
@@ -62,7 +69,9 @@ public class FractalExportDialogController {
         fchooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png"));
         File selectedFile = fchooser.showSaveDialog(null);
         if (selectedFile != null) {
-            exportPathTextField.setText(selectedFile.getAbsolutePath());
+            String path = selectedFile.getAbsolutePath();
+            exportPathTextField.setText(path);
+            exportPathTextField.positionCaret(path.length());
         }
     }
 
