@@ -1,17 +1,20 @@
 package org.jfractals.ui;
 
+import org.jfractals.utils.MathUtils;
+
 public final class FractalExportSettings {
     private int widthPx = 1920;
     private int heightPx = 1080;
     private int aspectRatioWidth = 16;
     private int aspectRatioHeight = 9;
+    private FractalExportImageExtension imageExtension = FractalExportImageExtension.PNG;
 
     public int getWidthPx() {
         return widthPx;
     }
     public void setWidthPx(int newWidthPx) {
         widthPx = newWidthPx;
-        int gcd = greatestCommonDivisor(widthPx, heightPx);
+        int gcd = MathUtils.greatestCommonDivisor(widthPx, heightPx);
         aspectRatioWidth = widthPx / gcd;
         aspectRatioHeight = heightPx / gcd;
     }
@@ -21,7 +24,7 @@ public final class FractalExportSettings {
     }
     public void setHeightPx(int newHeightPx) {
         heightPx = newHeightPx;
-        int gcd = greatestCommonDivisor(widthPx, heightPx);
+        int gcd = MathUtils.greatestCommonDivisor(widthPx, heightPx);
         aspectRatioWidth = widthPx / gcd;
         aspectRatioHeight = heightPx / gcd;
     }
@@ -31,7 +34,7 @@ public final class FractalExportSettings {
     }
     public void setAspectRatioWidth(int newAspectRatioWidth) {
         aspectRatioWidth = newAspectRatioWidth;
-        setWidthPx(Math.round(aspectRatioWidth * heightPx / aspectRatioHeight));
+        setWidthPx(aspectRatioWidth * heightPx / aspectRatioHeight);
     }
 
     public int getAspectRatioHeight() {
@@ -39,15 +42,9 @@ public final class FractalExportSettings {
     }
     public void setAspectRatioHeight(int newAspectRatioHeight) {
         aspectRatioHeight = newAspectRatioHeight;
-        setHeightPx(Math.round(widthPx * aspectRatioHeight / aspectRatioWidth));
+        setHeightPx(widthPx * aspectRatioHeight / aspectRatioWidth);
     }
 
-    private static int greatestCommonDivisor(int a, int b) {
-        while (b != 0) {
-            int remainder = a % b;
-            a = b;
-            b = remainder;
-        }
-        return Math.abs(a);
-    }
+    public FractalExportImageExtension getImageExtension() { return imageExtension; }
+    public void setImageExtension(FractalExportImageExtension imageExtension) { this.imageExtension = imageExtension; }
 }

@@ -12,8 +12,8 @@
     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
 
     <!-- File Selection Section -->
+    <Label text="Export Location" style="-fx-font-weight: bold;"/>
     <VBox spacing="6">
-        <Label text="Export Location" style="-fx-font-weight: bold;"/>
         <HBox spacing="8" alignment="CENTER_LEFT">
             <TextField fx:id="exportPathTextField" text="Select a file to save to..." HBox.hgrow="ALWAYS"/>
             <Button text="Browse..." onAction="#onBrowseClicked" minWidth="80"/>
@@ -22,9 +22,8 @@
 
     <Separator/>
 
-    <Label text="Image properties" style="-fx-font-weight: bold;"/>
-
     <!-- Parameters Form -->
+    <Label text="Image properties" style="-fx-font-weight: bold;"/>
     <GridPane hgap="12" vgap="12" maxWidth="Infinity">
         <columnConstraints>
             <ColumnConstraints minWidth="110"/>
@@ -47,6 +46,14 @@
             <Spinner fx:id="aspectRatioHeightSpinner" HBox.hgrow="ALWAYS" maxWidth="Infinity" minWidth="80"  editable="true"/>
         </HBox>
     </GridPane>
+
+    <Separator/>
+
+    <!-- Image extension -->
+    <Label text="Image Extension" style="-fx-font-weight: bold;"/>
+    <VBox spacing="6">
+        <ComboBox fx:id="imageExtensionCombo" maxWidth="Infinity"/>
+    </VBox>
 
     <Separator/>
 

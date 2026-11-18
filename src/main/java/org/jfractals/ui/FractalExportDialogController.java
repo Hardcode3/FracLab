@@ -5,11 +5,13 @@ import java.util.function.IntConsumer;
 import java.util.function.UnaryOperator;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.stage.FileChooser;
+import org.jfractals.utils.FileUtils;
 
 public class FractalExportDialogController {
     private final FractalExportSettings settings = new FractalExportSettings();
@@ -21,6 +23,7 @@ public class FractalExportDialogController {
     @FXML private Spinner<Integer> heightSpinner;
     @FXML private Spinner<Integer> aspectRatioWidthSpinner;
     @FXML private Spinner<Integer> aspectRatioHeightSpinner;
+    @FXML private ComboBox<FractalExportImageExtension> imageExtensionCombo;
 
     @FXML
     private void initialize() {
@@ -37,6 +40,20 @@ public class FractalExportDialogController {
         connect(heightSpinner, settings::setHeightPx);
         connect(aspectRatioWidthSpinner, settings::setAspectRatioWidth);
         connect(aspectRatioHeightSpinner, settings::setAspectRatioHeight);
+
+        imageExtensionCombo.getItems().setAll(FractalExportImageExtension.values());
+        imageExtensionCombo.setValue(settings.getImageExtension());
+        imageExtensionCombo.valueProperty().addListener((obs, oldValue, newValue) -> {
+            if (newValue != null) {
+                settings.setImageExtension(newValue);
+
+                File currentExportPath = new File(exportPathTextField.getText());
+                if (currentExportPath.isFile()) {
+                    String fileWithNewExtension = FileUtils.replaceFileExtension(currentExportPath.toString(), newValue.toString());
+                    updateExportPathTextField(fileWithNewExtension);
+                }
+            }
+        });
     }
 
     private void connect(Spinner<Integer> spinner, IntConsumer setter) {
@@ -61,17 +78,25 @@ public class FractalExportDialogController {
         }
     }
 
+    private void updateExportPathTextField(String newExportPath) {
+        exportPathTextField.setText(newExportPath);
+        exportPathTextField.positionCaret(newExportPath.length());
+    }
+
     @FXML
     private void onBrowseClicked() {
-        FileChooser fchooser = new FileChooser();
-        fchooser.setTitle("Choose a file to export the fractal");
-        fchooser.setInitialFileName("fractal_image.png");
-        fchooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png"));
-        File selectedFile = fchooser.showSaveDialog(null);
+        String imageExtension = FractalExportImageExtension.PNG.toString();
+        if (imageExtensionCombo.getValue() != null) {
+            imageExtension = imageExtensionCombo.getValue().toString();
+        }
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose a file to export the fractal");
+        fileChooser.setInitialFileName("fractal_image." + imageExtension);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*." + imageExtension));
+        File selectedFile = fileChooser.showSaveDialog(null);
         if (selectedFile != null) {
             String path = selectedFile.getAbsolutePath();
-            exportPathTextField.setText(path);
-            exportPathTextField.positionCaret(path.length());
+            updateExportPathTextField(path);
         }
     }
 
