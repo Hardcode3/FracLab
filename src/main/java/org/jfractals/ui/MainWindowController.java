@@ -3,11 +3,13 @@ package org.jfractals.ui;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
+import org.jfractals.ui.export.FractalExportDialog;
+import org.jfractals.ui.view.FractalViewController;
 
 public class MainWindowController {
     private final FractalExportDialog exportDialog = new FractalExportDialog();
     private final ViewOptions viewOptions = new ViewOptions();
-    @FXML private FractalController fractalViewController;
+    @FXML private FractalViewController fractalViewController;
     @FXML private CheckMenuItem showScaleMenuItem;
     @FXML private CheckMenuItem showInfoLabel;
     @FXML private CheckMenuItem showZoomMenuItem;
@@ -33,7 +35,7 @@ public class MainWindowController {
     }
 
     @FXML private void showExportDialog() {
-        exportDialog.show();
+        exportDialog.show(fractalViewController.getRenderState());
     }
 
     public void onViewReady(Scene scene) {

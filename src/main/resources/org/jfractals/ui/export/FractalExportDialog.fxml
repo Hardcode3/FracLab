@@ -6,7 +6,7 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.jfractals.ui.FractalExportDialogController"
+      fx:controller="org.jfractals.ui.export.FractalExportDialogController"
       spacing="16"
       prefWidth="400">
     <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
@@ -59,7 +59,7 @@
 
     <!-- Bottom Action Bar -->
     <HBox spacing="10" alignment="CENTER_LEFT">
-        <Label text="Export may take a while..." textFill="#666666"/>
+        <Label fx:id="exportStatus" text="Waiting for export instructions. Idle." textFill="#666666"/>
         <Region HBox.hgrow="ALWAYS"/>
         <Button text="Export" defaultButton="true" minWidth="90" onAction="#onExportClicked"/>
     </HBox>

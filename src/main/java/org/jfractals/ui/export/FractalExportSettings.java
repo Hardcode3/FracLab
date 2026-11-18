@@ -1,6 +1,8 @@
-package org.jfractals.ui;
+package org.jfractals.ui.export;
 
 import org.jfractals.utils.MathUtils;
+
+import java.io.File;
 
 public final class FractalExportSettings {
     private int widthPx = 1920;
@@ -8,6 +10,7 @@ public final class FractalExportSettings {
     private int aspectRatioWidth = 16;
     private int aspectRatioHeight = 9;
     private FractalExportImageExtension imageExtension = FractalExportImageExtension.PNG;
+    private File fpath = new File("");
 
     public int getWidthPx() {
         return widthPx;
@@ -47,4 +50,11 @@ public final class FractalExportSettings {
 
     public FractalExportImageExtension getImageExtension() { return imageExtension; }
     public void setImageExtension(FractalExportImageExtension imageExtension) { this.imageExtension = imageExtension; }
+
+    File getFpath() {
+        return fpath;
+    }
+    void setFpath(File fpath) {
+        this.fpath = fpath;
+    }
 }

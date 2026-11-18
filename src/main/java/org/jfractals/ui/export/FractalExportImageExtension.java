@@ -1,4 +1,4 @@
-package org.jfractals.ui;
+package org.jfractals.ui.export;
 
 public enum FractalExportImageExtension {
     PNG("png"),

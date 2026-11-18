@@ -1,4 +1,4 @@
-package org.jfractals.ui;
+package org.jfractals.ui.settings;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
@@ -11,7 +11,7 @@ import org.jfractals.model.FractalType;
 import java.util.function.Predicate;
 
 /** Binds the settings form to the application's shared settings model. */
-public final class SettingsController {
+public final class SettingsDialogController {
     @FXML private ComboBox<FractalType> typeChoice;
     @FXML private Spinner<Integer> maxIterationsSpinner;
     @FXML private Spinner<Double> escapeRadiusSpinner;

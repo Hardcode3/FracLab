@@ -1,10 +1,9 @@
 package org.jfractals.ui.overlay;
 
-import org.jfractals.ui.Viewport;
-
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.Label;
+import org.jfractals.ui.view.Viewport;
 
 public final class ViewInfoLabel extends Label {
     private BooleanProperty showZoomProperty = new SimpleBooleanProperty(this, "showZoom", true);

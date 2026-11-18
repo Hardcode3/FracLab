@@ -1,20 +1,20 @@
-package org.jfractals.ui;
+package org.jfractals.ui.export;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.function.IntConsumer;
 import java.util.function.UnaryOperator;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import org.jfractals.ui.view.FractalViewState;
 import org.jfractals.utils.FileUtils;
 
 public class FractalExportDialogController {
     private final FractalExportSettings settings = new FractalExportSettings();
+    private FractalViewState renderState;
     private boolean syncingControls;
     private static final UnaryOperator<TextFormatter.Change> SPINNER_INTEGER_FILTER = change -> change.getControlNewText().matches("\\d{0,6}") ? change : null;
 
@@ -24,6 +24,7 @@ public class FractalExportDialogController {
     @FXML private Spinner<Integer> aspectRatioWidthSpinner;
     @FXML private Spinner<Integer> aspectRatioHeightSpinner;
     @FXML private ComboBox<FractalExportImageExtension> imageExtensionCombo;
+    @FXML private Label exportStatus;
 
     @FXML
     private void initialize() {
@@ -50,7 +51,9 @@ public class FractalExportDialogController {
                 File currentExportPath = new File(exportPathTextField.getText());
                 if (currentExportPath.isFile()) {
                     String fileWithNewExtension = FileUtils.replaceFileExtension(currentExportPath.toString(), newValue.toString());
-                    updateExportPathTextField(fileWithNewExtension);
+                    exportPathTextField.setText(fileWithNewExtension);
+                    exportPathTextField.positionCaret(fileWithNewExtension.length());
+                    settings.setFpath(new File(fileWithNewExtension));
                 }
             }
         });
@@ -78,9 +81,17 @@ public class FractalExportDialogController {
         }
     }
 
-    private void updateExportPathTextField(String newExportPath) {
-        exportPathTextField.setText(newExportPath);
-        exportPathTextField.positionCaret(newExportPath.length());
+    public void setRenderState(FractalViewState renderState) {
+        this.renderState = renderState;
+    }
+
+    private static String getDefaultExportFileName(String extension) {
+        String formattedExtension = extension;
+        if (!extension.startsWith(".")) {
+            formattedExtension = "." + extension;
+        }
+        String currentDateTime = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss-").format(new Date());
+        return currentDateTime + "fractal_image" + formattedExtension;
     }
 
     @FXML
@@ -91,22 +102,23 @@ public class FractalExportDialogController {
         }
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose a file to export the fractal");
-        fileChooser.setInitialFileName("fractal_image." + imageExtension);
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*." + imageExtension));
+        fileChooser.setInitialFileName(getDefaultExportFileName(imageExtension));
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpeg"));
         File selectedFile = fileChooser.showSaveDialog(null);
         if (selectedFile != null) {
             String path = selectedFile.getAbsolutePath();
-            updateExportPathTextField(path);
+            exportPathTextField.setText(path);
+            exportPathTextField.positionCaret(path.length());
+            settings.setFpath(new File(path));
         }
     }
 
     @FXML void onExportClicked() {
-        String exportPath = exportPathTextField.getText();
-        if (exportPath != null && !exportPath.isEmpty()) {
-            // TODO: Implement the actual export logic here
-            System.out.println("Exporting fractal to: " + exportPath);
-        } else {
-            System.out.println("Export path is empty.");
-        }
+        // TODO: Validate
+        exportStatus.setText("Currently exporting...");
+        FractalExportService exportService = new FractalExportService();
+        exportService.export(renderState, settings, () -> {
+            exportStatus.setText("Export completed successfully! Idle.");
+        });
     }
 }

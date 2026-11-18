@@ -1,4 +1,4 @@
-package org.jfractals.ui;
+package org.jfractals.ui.view;
 
 public record Viewport(
         double centerXCp, double centerYCp,

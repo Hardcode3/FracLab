@@ -6,9 +6,9 @@
 <?import org.jfractals.ui.overlay.*?>
 
 <StackPane fx:id="fractalPane"
-           fx:controller="org.jfractals.ui.FractalController"
+           fx:controller="org.jfractals.ui.view.FractalViewController"
            xmlns:fx="http://javafx.com/fxml"
-           stylesheets="@fractal-view-overlay.css"
+           stylesheets="@FractalViewOverlay.css"
            minHeight="100" minWidth="100">
 
     <ImageView fx:id="fractalImageView"/>

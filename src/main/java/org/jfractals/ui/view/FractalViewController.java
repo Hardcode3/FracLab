@@ -1,4 +1,4 @@
-package org.jfractals.ui;
+package org.jfractals.ui.view;
 
 import javafx.animation.PauseTransition;
 import javafx.beans.InvalidationListener;
@@ -17,19 +17,21 @@ import java.util.function.Consumer;
 import org.jfractals.model.FractalSettings;
 import org.jfractals.render.FractalRenderService;
 import org.jfractals.render.FractalRenderer;
+import org.jfractals.ui.ViewOptions;
 import org.jfractals.ui.overlay.AxisOverlay;
 import org.jfractals.ui.overlay.CursorCoordinateTip;
 import org.jfractals.ui.overlay.ScaleBar;
 import org.jfractals.ui.overlay.ViewInfoLabel;
+import org.jfractals.ui.settings.SettingsDialog;
 
-public final class FractalController implements AutoCloseable {
+public final class FractalViewController implements AutoCloseable {
     private static final double ZOOM_SPEED = 0.005;
     private static final Duration RENDER_DEBOUNCE_MS = Duration.millis(150);
 
     private final FractalSettings settings = new FractalSettings();
     private final FractalRenderService renderService = new FractalRenderService(new FractalRenderer());
     private final PauseTransition renderDebounce = new PauseTransition(RENDER_DEBOUNCE_MS);
-    private final SettingsWindow settingsWindow = new SettingsWindow();
+    private final SettingsDialog settingsWindow = new SettingsDialog();
 
     private Viewport viewport = Viewport.initial();
     private List<Node> panLayers;
@@ -79,7 +81,7 @@ public final class FractalController implements AutoCloseable {
         settingsWindow.show(fractalPane.getScene().getWindow(), settings);
     }
 
-    void setViewOptions(ViewOptions viewOptions) {
+    public void setViewOptions(ViewOptions viewOptions) {
         scaleBar.visibleProperty().bind(viewOptions.getShowScaleProperty());
         infoLabel.visibleProperty().bind(viewOptions.getShowInfoLabelProperty());
         infoLabel.getShowCenterCoordinatesProperty().bind(viewOptions.getShowCenterCoordinatesProperty());
@@ -152,6 +154,10 @@ public final class FractalController implements AutoCloseable {
                 settings.snapshot(),
                 onRendered
         );
+    }
+
+    public FractalViewState getRenderState() {
+        return new FractalViewState(viewport, settings.snapshot());
     }
 
     @Override
