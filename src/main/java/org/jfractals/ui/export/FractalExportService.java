@@ -25,8 +25,8 @@ public class FractalExportService {
             String imageExtension = exportSettings.getImageExtension().toString().toLowerCase();
             if (!Arrays.asList(ImageIO.getWriterFormatNames()).contains(imageExtension)) {
                 throw new RuntimeException(
-                        "Invalid image extension " + imageExtension + " is not supported by the write backend. " +
-                        "Compatible extensions are: " + ImageIO.getWriterFormatNames().toString()
+                    "Invalid image extension " + imageExtension + " is not supported by the image writer backend. " +
+                    "Compatible extensions are: " + Arrays.asList(ImageIO.getWriterFormatNames())
                 );
             }
             File exportFile = exportSettings.getFpath();
