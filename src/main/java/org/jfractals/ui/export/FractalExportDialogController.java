@@ -44,7 +44,7 @@ public class FractalExportDialogController {
 
         imageExtensionCombo.getItems().setAll(FractalExportImageExtension.values());
         imageExtensionCombo.setValue(settings.getImageExtension());
-        imageExtensionCombo.valueProperty().addListener((obs, oldValue, newValue) -> {
+        imageExtensionCombo.valueProperty().addListener((_, _, newValue) -> {
             if (newValue != null) {
                 settings.setImageExtension(newValue);
 
@@ -60,7 +60,7 @@ public class FractalExportDialogController {
     }
 
     private void connect(Spinner<Integer> spinner, IntConsumer setter) {
-        spinner.getValueFactory().valueProperty().addListener((obs, oldValue, newValue) -> {
+        spinner.getValueFactory().valueProperty().addListener((_, _, newValue) -> {
             if (syncingControls || newValue == null) {
                 return;
             }
