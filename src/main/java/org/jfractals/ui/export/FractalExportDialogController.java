@@ -10,7 +10,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import org.jfractals.ui.view.FractalViewController;
-import org.jfractals.ui.view.FractalViewState;
 import org.jfractals.utils.FileUtils;
 
 public class FractalExportDialogController {

@@ -7,7 +7,6 @@ import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import org.jfractals.ui.view.FractalViewController;
-import org.jfractals.ui.view.FractalViewState;
 
 public class FractalExportDialog implements AutoCloseable {
     private static final String WIN_TITLE = "Fractal Export";
