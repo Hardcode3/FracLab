@@ -5,7 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.control.Label;
-import org.jfractals.ui.Viewport;
+import org.jfractals.ui.view.Viewport;
 
 public final class ScaleBar extends VBox {
     private static final double SCALE_TARGET_WIDTH_PX = 150;

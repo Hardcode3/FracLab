@@ -1,7 +1,7 @@
 package org.jfractals.ui.overlay;
 
 import javafx.scene.control.Label;
-import org.jfractals.ui.Viewport;
+import org.jfractals.ui.view.Viewport;
 
 public final class CursorCoordinateTip extends Label {
     private final static double OFFSET_X_PX = 10;

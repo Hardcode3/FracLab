@@ -3,7 +3,7 @@ package org.jfractals.ui.overlay;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import org.jfractals.ui.Viewport;
+import org.jfractals.ui.view.Viewport;
 
 public final class AxisOverlay extends Pane {
     private final static Color AXIS_COLOR = Color.GRAY;

@@ -20,7 +20,7 @@ public final class JFractalsApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        URL resource = getClass().getResource("/org/jfractals/ui/main-window.fxml");
+        URL resource = getClass().getResource("/org/jfractals/ui/MainWindow.fxml");
         FXMLLoader loader = new FXMLLoader(resource);
         Parent root = loader.load();
         mainWindowController = loader.getController();
@@ -30,7 +30,7 @@ public final class JFractalsApplication extends Application {
         primaryStage.setScene(scene);
         primaryStage.setOnShown(_ -> mainWindowController.onViewReady(scene));
 
-        URL logo = getClass().getResource("/org/jfractals/ui/logo_mandelbrot.png");
+        URL logo = getClass().getResource("/org/jfractals/ui/AppLogo.png");
         if (logo != null) {
             primaryStage.getIcons().add(new Image(logo.toExternalForm()));
         }

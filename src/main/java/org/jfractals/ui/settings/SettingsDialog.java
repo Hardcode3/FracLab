@@ -1,4 +1,4 @@
-package org.jfractals.ui;
+package org.jfractals.ui.settings;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -10,20 +10,20 @@ import org.jfractals.model.FractalSettings;
 
 import java.io.IOException;
 
-final class SettingsWindow implements AutoCloseable {
+public final class SettingsDialog implements AutoCloseable {
     private static final String WIN_TITLE = "Fractal Settings";
 
     private Stage stage;
 
-    void show(Window owner, FractalSettings settings) {
+    public void show(Window owner, FractalSettings settings) {
         if (stage != null && stage.isShowing()) {
             stage.toFront();
             return;
         }
         try {
-            FXMLLoader loader = new FXMLLoader(SettingsWindow.class.getResource("settings-view.fxml"));
+            FXMLLoader loader = new FXMLLoader(SettingsDialog.class.getResource("SettingsDialog.fxml"));
             Parent content = loader.load();
-            loader.<SettingsController>getController().setSettings(settings);
+            loader.<SettingsDialogController>getController().setSettings(settings);
 
             stage = new Stage();
             stage.setTitle(WIN_TITLE);
