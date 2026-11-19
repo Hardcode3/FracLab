@@ -6,8 +6,8 @@ import javafx.scene.control.Label;
 import org.jfractals.ui.view.Viewport;
 
 public final class ViewInfoLabel extends Label {
-    private BooleanProperty showZoomProperty = new SimpleBooleanProperty(this, "showZoom", true);
-    private BooleanProperty showCenterCoordinatesProperty = new SimpleBooleanProperty(this, "showCenterCoordinates", true);
+    final private BooleanProperty showZoomProperty = new SimpleBooleanProperty(this, "showZoom", true);
+    final private BooleanProperty showCenterCoordinatesProperty = new SimpleBooleanProperty(this, "showCenterCoordinates", true);
 
     private Viewport currenViewport;
 
