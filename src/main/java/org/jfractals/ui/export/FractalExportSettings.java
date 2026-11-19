@@ -78,8 +78,8 @@ public final class FractalExportSettings {
     }
     public boolean isFPathValid() {
         return (fpath != null &&
-                fpath.canRead() &&
                 fpath.getParentFile() != null &&
+                fpath.getParentFile().canRead() &&
                 fpath.getParentFile().exists()
         );
     }

@@ -12,6 +12,7 @@ import org.jfractals.ui.view.Viewport;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class FractalExportService {
@@ -22,6 +23,12 @@ public class FractalExportService {
         Consumer<WritableImage> postRender = image -> {
             BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
             String imageExtension = exportSettings.getImageExtension().toString().toLowerCase();
+            if (!Arrays.asList(ImageIO.getWriterFormatNames()).contains(imageExtension)) {
+                throw new RuntimeException(
+                        "Invalid image extension " + imageExtension + " is not supported by the write backend. " +
+                        "Compatible extensions are: " + ImageIO.getWriterFormatNames()
+                );
+            }
             File exportFile = exportSettings.getFpath();
             try {
                 ImageIO.write(bufferedImage, imageExtension, exportFile);

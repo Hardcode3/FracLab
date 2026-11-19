@@ -8,8 +8,10 @@ public enum FractalExportImageExtension {
     BMP("bmp"),
     GIF("gif"),
     PNG("png"),
+    TIF("tif"),
     TIFF("tiff"),
     WBMP("wbmp"),
+    JPG("jpg"),
     JPEG("jpeg");
 
     private final String displayName;

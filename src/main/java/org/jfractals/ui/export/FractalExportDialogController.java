@@ -113,7 +113,7 @@ public class FractalExportDialogController {
             return;
         }
         exportStatus.setText("Currently exporting...");
-        FractalExportService exportService = new FractalExportService();
+        var exportService = new FractalExportService();
         Runnable onRendered = () -> exportStatus.setText("Export completed successfully! Idle.");
         exportService.export(fractalViewController.getRenderState(), settings, onRendered);
     }
