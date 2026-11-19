@@ -1,9 +1,9 @@
-package org.jfractals.ui;
+package org.jfractals.ui.overlay;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
-public final class ViewOptions {
+public final class OverlayOptions {
     private final BooleanProperty showScale = new SimpleBooleanProperty(this, "showScale", true);
 
     private final BooleanProperty showInfoLabel = new SimpleBooleanProperty(this, "showInfoLabel", true);

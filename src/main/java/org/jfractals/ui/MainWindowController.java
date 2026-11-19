@@ -4,11 +4,12 @@ import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
 import org.jfractals.ui.export.FractalExportDialog;
+import org.jfractals.ui.overlay.OverlayOptions;
 import org.jfractals.ui.view.FractalViewController;
 
 public class MainWindowController {
     private final FractalExportDialog exportDialog = new FractalExportDialog();
-    private final ViewOptions viewOptions = new ViewOptions();
+    private final OverlayOptions overlayOptions = new OverlayOptions();
     @FXML private FractalViewController fractalViewController;
     @FXML private CheckMenuItem showScaleMenuItem;
     @FXML private CheckMenuItem showInfoLabel;
@@ -18,12 +19,12 @@ public class MainWindowController {
 
     @FXML
     private void initialize() {
-        showScaleMenuItem.selectedProperty().bindBidirectional(viewOptions.getShowScaleProperty());
-        showInfoLabel.selectedProperty().bindBidirectional(viewOptions.getShowInfoLabelProperty());
-        showZoomMenuItem.selectedProperty().bindBidirectional(viewOptions.getShowZoomProperty());
-        showCenterCoordinatesMenuItem.selectedProperty().bindBidirectional(viewOptions.getShowCenterCoordinatesProperty());
-        showAxesMenuItem.selectedProperty().bindBidirectional(viewOptions.getShowAxesProperty());
-        fractalViewController.setViewOptions(viewOptions);
+        showScaleMenuItem.selectedProperty().bindBidirectional(overlayOptions.getShowScaleProperty());
+        showInfoLabel.selectedProperty().bindBidirectional(overlayOptions.getShowInfoLabelProperty());
+        showZoomMenuItem.selectedProperty().bindBidirectional(overlayOptions.getShowZoomProperty());
+        showCenterCoordinatesMenuItem.selectedProperty().bindBidirectional(overlayOptions.getShowCenterCoordinatesProperty());
+        showAxesMenuItem.selectedProperty().bindBidirectional(overlayOptions.getShowAxesProperty());
+        fractalViewController.setViewOptions(overlayOptions);
     }
 
     @FXML private void resetView() {
@@ -35,7 +36,7 @@ public class MainWindowController {
     }
 
     @FXML private void showExportDialog() {
-        exportDialog.show(fractalViewController.getRenderState());
+        exportDialog.show(fractalViewController);
     }
 
     public void onViewReady(Scene scene) {

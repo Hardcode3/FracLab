@@ -17,7 +17,7 @@ import java.util.function.Consumer;
 import org.jfractals.model.FractalSettings;
 import org.jfractals.render.FractalRenderService;
 import org.jfractals.render.FractalRenderer;
-import org.jfractals.ui.ViewOptions;
+import org.jfractals.ui.overlay.OverlayOptions;
 import org.jfractals.ui.overlay.AxisOverlay;
 import org.jfractals.ui.overlay.CursorCoordinateTip;
 import org.jfractals.ui.overlay.ScaleBar;
@@ -81,12 +81,12 @@ public final class FractalViewController implements AutoCloseable {
         settingsWindow.show(fractalPane.getScene().getWindow(), settings);
     }
 
-    public void setViewOptions(ViewOptions viewOptions) {
-        scaleBar.visibleProperty().bind(viewOptions.getShowScaleProperty());
-        infoLabel.visibleProperty().bind(viewOptions.getShowInfoLabelProperty());
-        infoLabel.getShowCenterCoordinatesProperty().bind(viewOptions.getShowCenterCoordinatesProperty());
-        infoLabel.getShowZoomProperty().bind(viewOptions.getShowZoomProperty());
-        axisOverlay.visibleProperty().bind(viewOptions.getShowAxesProperty());
+    public void setViewOptions(OverlayOptions overlayOptions) {
+        scaleBar.visibleProperty().bind(overlayOptions.getShowScaleProperty());
+        infoLabel.visibleProperty().bind(overlayOptions.getShowInfoLabelProperty());
+        infoLabel.getShowCenterCoordinatesProperty().bind(overlayOptions.getShowCenterCoordinatesProperty());
+        infoLabel.getShowZoomProperty().bind(overlayOptions.getShowZoomProperty());
+        axisOverlay.visibleProperty().bind(overlayOptions.getShowAxesProperty());
     }
 
     private void handleKeyPressed(KeyEvent event) {

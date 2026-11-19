@@ -1,4 +1,4 @@
-package org.jfractals.app;
+package org.jfractals.ui;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -8,10 +8,9 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
-import org.jfractals.ui.MainWindowController;
 
 /** Creates and owns the primary application window. */
-public final class JFractalsApplication extends Application {
+public final class MainWindow extends Application {
     private static final double INITIAL_WIN_WIDTH_PX = 720;
     private static final double INITIAL_WIN_HEIGHT_PX = 480;
     private static final String WIN_TITLE = "JFractals";
