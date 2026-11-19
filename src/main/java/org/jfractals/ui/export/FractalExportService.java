@@ -26,7 +26,7 @@ public class FractalExportService {
             try {
                 ImageIO.write(bufferedImage, imageExtension, exportFile);
             } catch (java.io.IOException e) {
-                throw new RuntimeException("Could not save fractal image " + exportFile.toString() + " to disk", e);
+                throw new RuntimeException("Could not save fractal image " + exportFile + " to disk", e);
             }
             if (onRendered != null) {
                 Platform.runLater(onRendered);
