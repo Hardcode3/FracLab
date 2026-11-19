@@ -12,6 +12,7 @@ import org.jfractals.ui.view.Viewport;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.function.Consumer;
 
@@ -31,7 +32,10 @@ public class FractalExportService {
             }
             File exportFile = exportSettings.getFpath();
             try {
-                ImageIO.write(bufferedImage, imageExtension, exportFile);
+                boolean written = ImageIO.write(bufferedImage, imageExtension, exportFile);
+                if (!written) {
+                    throw new IOException("No writer could encode this image as " + imageExtension);
+                }
             } catch (java.io.IOException e) {
                 throw new RuntimeException("Could not save fractal image " + exportFile + " to disk", e);
             }
