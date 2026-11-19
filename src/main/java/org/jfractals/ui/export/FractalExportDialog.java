@@ -6,6 +6,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import org.jfractals.ui.view.FractalViewController;
 import org.jfractals.ui.view.FractalViewState;
 
 public class FractalExportDialog implements AutoCloseable {
@@ -13,7 +14,7 @@ public class FractalExportDialog implements AutoCloseable {
 
     private Stage stage;
 
-    public void show(FractalViewState renderState) {
+    public void show(FractalViewController fractalViewController) {
         if (stage != null && stage.isShowing()) {
             stage.toFront();
             return;
@@ -23,7 +24,7 @@ public class FractalExportDialog implements AutoCloseable {
             Parent content = loader.load();
 
             FractalExportDialogController controller = loader.getController();
-            controller.setRenderState(renderState);
+            controller.setFractalViewController(fractalViewController);
 
             stage = new Stage();
             stage.setTitle(WIN_TITLE);

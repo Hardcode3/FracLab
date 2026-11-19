@@ -36,7 +36,7 @@ public class MainWindowController {
     }
 
     @FXML private void showExportDialog() {
-        exportDialog.show(fractalViewController.getRenderState());
+        exportDialog.show(fractalViewController);
     }
 
     public void onViewReady(Scene scene) {

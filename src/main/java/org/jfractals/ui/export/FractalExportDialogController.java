@@ -9,12 +9,13 @@ import java.util.function.UnaryOperator;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import org.jfractals.ui.view.FractalViewController;
 import org.jfractals.ui.view.FractalViewState;
 import org.jfractals.utils.FileUtils;
 
 public class FractalExportDialogController {
     private final FractalExportSettings settings = new FractalExportSettings();
-    private FractalViewState renderState;
+    private FractalViewController fractalViewController;
     private boolean syncingControls;
     private static final UnaryOperator<TextFormatter.Change> SPINNER_INTEGER_FILTER = change -> change.getControlNewText().matches("\\d{0,6}") ? change : null;
 
@@ -81,10 +82,6 @@ public class FractalExportDialogController {
         }
     }
 
-    public void setRenderState(FractalViewState renderState) {
-        this.renderState = renderState;
-    }
-
     private static String getDefaultExportFileName(String extension) {
         String formattedExtension = extension;
         if (!extension.startsWith(".")) {
@@ -92,6 +89,10 @@ public class FractalExportDialogController {
         }
         String currentDateTime = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss-").format(new Date());
         return currentDateTime + "fractal_image" + formattedExtension;
+    }
+
+    public void setFractalViewController(FractalViewController fractalViewController) {
+        this.fractalViewController = fractalViewController;
     }
 
     @FXML
@@ -117,7 +118,7 @@ public class FractalExportDialogController {
         // TODO: Validate
         exportStatus.setText("Currently exporting...");
         FractalExportService exportService = new FractalExportService();
-        exportService.export(renderState, settings, () -> {
+        exportService.export(fractalViewController.getRenderState(), settings, () -> {
             exportStatus.setText("Export completed successfully! Idle.");
         });
     }
