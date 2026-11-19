@@ -30,6 +30,10 @@ public class FractalExportDialog implements AutoCloseable {
             stage.setResizable(false);
             stage.setScene(new Scene(content));
             stage.setOnHidden(_ -> stage = null);
+            stage.setOnShown(_ -> {
+                content.requestFocus();
+                controller.onViewReady();
+            });
             stage.show();
         } catch (IOException e) {
             throw new IllegalStateException("Could not open fractal export dialog", e);

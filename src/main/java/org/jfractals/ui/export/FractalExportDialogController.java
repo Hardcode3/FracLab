@@ -1,8 +1,6 @@
 package org.jfractals.ui.export;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.function.IntConsumer;
 import java.util.function.UnaryOperator;
 
@@ -28,13 +26,13 @@ public class FractalExportDialogController {
 
     @FXML
     private void initialize() {
-        widthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(100, Integer.MAX_VALUE, 1920));
+        widthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(100, Integer.MAX_VALUE));
         widthSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
-        heightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(100, Integer.MAX_VALUE, 1080));
+        heightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(100, Integer.MAX_VALUE));
         heightSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
-        aspectRatioWidthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 16));
+        aspectRatioWidthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
         aspectRatioWidthSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
-        aspectRatioHeightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE, 9));
+        aspectRatioHeightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
         aspectRatioHeightSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
 
         connect(widthSpinner, settings::setWidthPx);
@@ -44,19 +42,14 @@ public class FractalExportDialogController {
 
         imageExtensionCombo.getItems().setAll(FractalExportImageExtension.values());
         imageExtensionCombo.setValue(settings.getImageExtension());
-        imageExtensionCombo.valueProperty().addListener((_, _, newValue) -> {
-            if (newValue != null) {
-                settings.setImageExtension(newValue);
+        imageExtensionCombo.valueProperty().addListener((_, _, newValue) -> updateExportPathExtension(newValue));
 
-                File currentExportPath = new File(exportPathTextField.getText());
-                if (currentExportPath.isFile()) {
-                    String fileWithNewExtension = FileUtils.replaceFileExtension(currentExportPath.toString(), newValue.toString());
-                    exportPathTextField.setText(fileWithNewExtension);
-                    exportPathTextField.positionCaret(fileWithNewExtension.length());
-                    settings.setFpath(new File(fileWithNewExtension));
-                }
-            }
-        });
+        exportPathTextField.textProperty().addListener((_, _, newValue) -> settings.setFPath(newValue));
+    }
+
+    public void onViewReady() {
+        refreshControlsFromSettings();
+        updateExportPathTextField(settings.getFpathString());
     }
 
     private void connect(Spinner<Integer> spinner, IntConsumer setter) {
@@ -81,40 +74,44 @@ public class FractalExportDialogController {
         }
     }
 
-    private static String getDefaultExportFileName(String extension) {
-        String formattedExtension = extension;
-        if (!extension.startsWith(".")) {
-            formattedExtension = "." + extension;
-        }
-        String currentDateTime = new SimpleDateFormat("yyyy_MM_dd-HH_mm_ss-").format(new Date());
-        return currentDateTime + "fractal_image" + formattedExtension;
-    }
-
     public void setFractalViewController(FractalViewController fractalViewController) {
         this.fractalViewController = fractalViewController;
     }
 
+    private void updateExportPathTextField(String newPath) {
+        exportPathTextField.setText(newPath);
+        exportPathTextField.positionCaret(newPath.length());
+    }
+
+    private void updateExportPathExtension(FractalExportImageExtension newExtension) {
+        if (newExtension == null) {
+            return;
+        }
+        settings.setImageExtension(newExtension);
+        String fileWithNewExtension = FileUtils.replaceFileExtension(settings.getFpathString(), newExtension.toString());
+        updateExportPathTextField(fileWithNewExtension);
+    }
+
     @FXML
     private void onBrowseClicked() {
-        String imageExtension = FractalExportImageExtension.PNG.toString();
-        if (imageExtensionCombo.getValue() != null) {
-            imageExtension = imageExtensionCombo.getValue().toString();
-        }
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose a file to export the fractal");
-        fileChooser.setInitialFileName(getDefaultExportFileName(imageExtension));
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpeg"));
+        fileChooser.setInitialDirectory(settings.getFpath().getParentFile());
+        fileChooser.setInitialFileName(settings.getFpath().getName());
+        var filter = new FileChooser.ExtensionFilter("Images", FractalExportImageExtension.getAllPatterns());
+        fileChooser.getExtensionFilters().add(filter);
         File selectedFile = fileChooser.showSaveDialog(null);
-        if (selectedFile != null) {
-            String path = selectedFile.getAbsolutePath();
-            exportPathTextField.setText(path);
-            exportPathTextField.positionCaret(path.length());
-            settings.setFpath(new File(path));
+        if (selectedFile == null) {
+            return;
         }
+        String path = selectedFile.getAbsolutePath();
+        updateExportPathTextField(path);
     }
 
     @FXML void onExportClicked() {
-        // TODO: Validate
+        if (!settings.isFPathValid()) {
+            return;
+        }
         exportStatus.setText("Currently exporting...");
         FractalExportService exportService = new FractalExportService();
         Runnable onRendered = () -> exportStatus.setText("Export completed successfully! Idle.");
