@@ -5,14 +5,9 @@ import java.util.Arrays;
 public enum FractalExportImageExtension {
     // Formats should be supported by imageio
     // cf. https://docs.oracle.com/javase/8/docs/api/javax/imageio/package-summary.html
-    BMP("bmp"),
     GIF("gif"),
     PNG("png"),
-    TIF("tif"),
-    TIFF("tiff"),
-    WBMP("wbmp"),
-    JPG("jpg"),
-    JPEG("jpeg");
+    TIFF("tiff");
 
     private final String displayName;
 
