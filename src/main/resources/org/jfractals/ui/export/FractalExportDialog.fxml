@@ -61,6 +61,6 @@
     <HBox spacing="10" alignment="CENTER_LEFT">
         <Label fx:id="exportStatus" text="Waiting for export instructions. Idle." textFill="#666666"/>
         <Region HBox.hgrow="ALWAYS"/>
-        <Button text="Export" defaultButton="true" minWidth="90" onAction="#onExportClicked"/>
+        <Button fx:id="exportButton" text="Export" defaultButton="true" minWidth="90" onAction="#onExportClicked"/>
     </HBox>
 </VBox>

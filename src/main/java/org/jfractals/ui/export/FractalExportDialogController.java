@@ -11,9 +11,11 @@ import org.jfractals.ui.view.FractalViewController;
 import org.jfractals.utils.FileUtils;
 
 public class FractalExportDialogController {
-    private final FractalExportSettings settings = new FractalExportSettings();
     private FractalViewController fractalViewController;
     private boolean syncingControls;
+
+    private final FractalExportService exportService = new FractalExportService();
+    private final FractalExportSettings settings = new FractalExportSettings();
     private static final UnaryOperator<TextFormatter.Change> SPINNER_INTEGER_FILTER = change -> change.getControlNewText().matches("\\d{0,6}") ? change : null;
 
     @FXML private TextField exportPathTextField;
@@ -23,6 +25,7 @@ public class FractalExportDialogController {
     @FXML private Spinner<Integer> aspectRatioHeightSpinner;
     @FXML private ComboBox<FractalExportImageExtension> imageExtensionCombo;
     @FXML private Label exportStatus;
+    @FXML private Button exportButton;
 
     @FXML
     private void initialize() {
@@ -109,12 +112,15 @@ public class FractalExportDialogController {
     }
 
     @FXML void onExportClicked() {
-        if (!settings.isFPathValid()) {
+        if (!settings.isFPathValid() || exportButton.isDisabled()) {
             return;
         }
+        exportButton.setDisable(true);
         exportStatus.setText("Currently exporting...");
-        var exportService = new FractalExportService();
-        Runnable onRendered = () -> exportStatus.setText("Export completed successfully! Idle.");
+        Runnable onRendered = () -> {
+            exportStatus.setText("Export completed successfully! Idle.");
+            exportButton.setDisable(false);
+        };
         exportService.export(fractalViewController.getRenderState(), settings, onRendered);
     }
 }
