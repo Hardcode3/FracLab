@@ -3,7 +3,6 @@ package org.jfractals.ui.settings;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.jfractals.model.FractalSettings;
@@ -28,7 +27,7 @@ public final class SettingsDialog implements AutoCloseable {
             stage = new Stage();
             stage.setTitle(WIN_TITLE);
             stage.initOwner(owner);
-            stage.initModality(Modality.WINDOW_MODAL);
+            stage.setResizable(false);
             stage.setScene(new Scene(content));
             stage.setOnHidden(_ -> stage = null);
             stage.show();
