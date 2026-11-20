@@ -3,7 +3,6 @@ package org.jfractals.ui.settings;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import org.jfractals.model.FractalSettings;
