@@ -28,7 +28,7 @@ public final class SettingsDialog implements AutoCloseable {
             stage = new Stage();
             stage.setTitle(WIN_TITLE);
             stage.initOwner(owner);
-            stage.initModality(Modality.WINDOW_MODAL);
+            stage.setResizable(false);
             stage.setScene(new Scene(content));
             stage.setOnHidden(_ -> stage = null);
             stage.show();
