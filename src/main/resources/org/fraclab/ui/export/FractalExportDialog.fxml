@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.fraclab.ui.export.FractalExportDialogController"
+      stylesheets="@FractalExportDialog.css"
+      styleClass="export-root"
+      spacing="0" prefWidth="470" minWidth="440">
+    <VBox styleClass="export-hero" spacing="5">
+        <Label text="FRACLAB  /  IMAGE EXPORT" styleClass="export-eyebrow"/>
+        <Label text="Export a fractal" styleClass="export-title"/>
+        <Label text="Choose a destination, image size, and format." styleClass="export-subtitle"/>
+    </VBox>
+
+    <VBox styleClass="export-content" spacing="12" maxWidth="Infinity">
+        <VBox styleClass="export-card" spacing="10">
+            <Label text="Save location" styleClass="section-title"/>
+            <HBox spacing="8" alignment="CENTER_LEFT">
+                <TextField fx:id="exportPathTextField"
+                           text="Select a file to save to..."
+                           promptText="Choose a destination"
+                           styleClass="export-path-field"
+                           HBox.hgrow="ALWAYS"/>
+                <Button text="Browse…" onAction="#onBrowseClicked" minWidth="84" styleClass="browse-button"/>
+            </HBox>
+        </VBox>
+
+        <VBox styleClass="export-card" spacing="12">
+            <Label text="Image properties" styleClass="section-title"/>
+            <GridPane hgap="12" vgap="12" maxWidth="Infinity">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="118"/>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                </columnConstraints>
+                <Label text="Image width (px)" styleClass="field-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <Spinner fx:id="widthSpinner" editable="true" maxWidth="Infinity" GridPane.rowIndex="0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+                <Label text="Image height (px)" styleClass="field-label" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Spinner fx:id="heightSpinner" editable="true" maxWidth="Infinity" GridPane.rowIndex="1" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS"/>
+                <Label text="Aspect ratio" styleClass="field-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <HBox spacing="8" alignment="CENTER_LEFT" GridPane.rowIndex="2" GridPane.columnIndex="1">
+                    <Spinner fx:id="aspectRatioWidthSpinner" editable="true" minWidth="70" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                    <Label text="×" styleClass="ratio-separator"/>
+                    <Spinner fx:id="aspectRatioHeightSpinner" editable="true" minWidth="70" maxWidth="Infinity" HBox.hgrow="ALWAYS"/>
+                </HBox>
+            </GridPane>
+        </VBox>
+
+        <VBox styleClass="export-card" spacing="8">
+            <Label text="Image format" styleClass="section-title"/>
+            <ComboBox fx:id="imageExtensionCombo" maxWidth="Infinity"/>
+        </VBox>
+
+        <HBox styleClass="export-footer" spacing="12" alignment="CENTER_LEFT" maxWidth="Infinity">
+            <Label fx:id="exportStatus"
+                   text="Waiting for export instructions. Idle."
+                   styleClass="export-status"
+                   wrapText="true"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="exportButton"
+                    text="Export image"
+                    defaultButton="true"
+                    minWidth="112"
+                    onAction="#onExportClicked"
+                    styleClass="export-button"/>
+        </HBox>
+    </VBox>
+</VBox>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import org.fraclab.ui.overlay.*?>
+
+<StackPane fx:id="fractalPane"
+           fx:controller="org.fraclab.ui.view.FractalViewController"
+           xmlns:fx="http://javafx.com/fxml"
+           stylesheets="@FractalViewOverlay.css"
+           minHeight="100" minWidth="100">
+
+    <ImageView fx:id="fractalImageView"/>
+    <AxisOverlay fx:id="axisOverlay"/>
+
+    <ViewInfoLabel fx:id="infoLabel" StackPane.alignment="BOTTOM_LEFT">
+        <StackPane.margin><Insets topRightBottomLeft="10"/></StackPane.margin>
+    </ViewInfoLabel>
+
+    <ScaleBar fx:id="scaleBar" StackPane.alignment="BOTTOM_RIGHT"/>
+    <CursorCoordinateTip fx:id="cursorTip" StackPane.alignment="TOP_LEFT"/>
+</StackPane>
