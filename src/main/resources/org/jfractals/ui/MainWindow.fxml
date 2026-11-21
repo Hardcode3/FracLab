@@ -5,10 +5,6 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.CheckMenuItem?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
 
 <BorderPane
     fx:controller="org.jfractals.ui.MainWindowController"
@@ -16,41 +12,26 @@
     stylesheets="@MainWindowMenuBar.css">
 
     <top>
-        <HBox styleClass="top-bar" alignment="CENTER_LEFT">
-            <MenuBar HBox.hgrow="ALWAYS">
-                <Menu text="_FracLab">
-                    <MenuItem text="About FracLab" onAction="#showAboutWindow"/>
+        <MenuBar useSystemMenuBar="true">
+            <Menu text="_FracLab">
+                <MenuItem text="About" onAction="#showAboutWindow"/>
+            </Menu>
+            <Menu text="_Fractal">
+                <MenuItem text="Settings..." onAction="#showSettings"/>
+                <MenuItem text="Export..." onAction="#showExportDialog"/>
+            </Menu>
+            <Menu text="_View">
+                <MenuItem text="Reset View" onAction="#resetView"/>
+                <Menu text="Overlay">
+                    <CheckMenuItem fx:id="showScaleMenuItem" text="Show Scale" selected="true"/>
+                    <CheckMenuItem fx:id="showInfoLabel" text="Show Infos" selected="true"/>
+                    <CheckMenuItem fx:id="showZoomMenuItem" text="Show Zoom" selected="true"/>
+                    <CheckMenuItem fx:id="showCenterCoordinatesMenuItem" text="Show Center Coordinates"
+                                   selected="true"/>
+                    <CheckMenuItem fx:id="showAxesMenuItem" text="Show Axes" selected="true"/>
                 </Menu>
-                <Menu text="_Fractal">
-                    <MenuItem text="Settings..." onAction="#showSettings"/>
-                    <MenuItem text="Export..." onAction="#showExportDialog"/>
-                </Menu>
-                <Menu text="_View">
-                    <MenuItem text="Reset View" onAction="#resetView"/>
-                    <Menu text="Overlay">
-                        <CheckMenuItem fx:id="showScaleMenuItem" text="Show Scale" selected="true"/>
-                        <CheckMenuItem fx:id="showInfoLabel" text="Show Infos" selected="true"/>
-                        <CheckMenuItem fx:id="showZoomMenuItem" text="Show Zoom" selected="true"/>
-                        <CheckMenuItem fx:id="showCenterCoordinatesMenuItem" text="Show Center Coordinates"
-                                       selected="true"/>
-                        <CheckMenuItem fx:id="showAxesMenuItem" text="Show Axes" selected="true"/>
-                    </Menu>
-                </Menu>
-            </MenuBar>
-            <Button onAction="#showAboutWindow"
-                    styleClass="about-menu-button"
-                    accessibleText="About FracLab"
-                    mnemonicParsing="false">
-                <graphic>
-                    <HBox alignment="CENTER" spacing="8">
-                        <StackPane styleClass="about-info-icon">
-                            <Label text="i" styleClass="about-info-letter"/>
-                        </StackPane>
-                        <Label text="About FracLab" styleClass="about-button-label"/>
-                    </HBox>
-                </graphic>
-            </Button>
-        </HBox>
+            </Menu>
+        </MenuBar>
     </top>
     <center>
         <fx:include fx:id="fractalView" source="view/FractalView.fxml" />

@@ -1,0 +1,106 @@
+.settings-root {
+    -fx-background-color: #f4f6fb;
+}
+
+.settings-hero {
+    -fx-background-color: linear-gradient(to bottom right, #101a3b, #214a91);
+    -fx-padding: 20px 22px 18px 22px;
+}
+
+.settings-eyebrow {
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #b9c9f2;
+}
+
+.settings-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.settings-subtitle {
+    -fx-font-size: 12px;
+    -fx-text-fill: #d4def8;
+}
+
+.settings-content {
+    -fx-padding: 18px 22px 20px 22px;
+}
+
+.settings-form {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: #e2e7f1;
+    -fx-border-radius: 10px;
+    -fx-padding: 16px;
+}
+
+.field-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #35415a;
+}
+
+.settings-root .combo-box,
+.settings-root .spinner {
+    -fx-background-color: white;
+    -fx-background-radius: 6px;
+    -fx-border-color: #d9e0ed;
+    -fx-border-radius: 6px;
+    -fx-font-size: 12px;
+}
+
+.settings-root .combo-box:focused,
+.settings-root .spinner:focused {
+    -fx-border-color: #5577ca;
+    -fx-effect: dropshadow(gaussian, rgba(41, 79, 168, 0.14), 5, 0, 0, 1);
+}
+
+.settings-root .spinner .text-field {
+    -fx-background-color: transparent;
+    -fx-background-radius: 6px;
+    -fx-border-color: transparent;
+    -fx-padding: 5px 7px;
+}
+
+.settings-root .combo-box .list-cell {
+    -fx-text-fill: #26334d;
+}
+
+.settings-root .check-box .box {
+    -fx-background-color: white;
+    -fx-border-color: #aebbd1;
+    -fx-border-radius: 4px;
+    -fx-background-radius: 4px;
+}
+
+.settings-root .check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+.settings-root .check-box:selected .box {
+    -fx-background-color: #294fa8;
+    -fx-border-color: #294fa8;
+}
+
+.settings-note {
+    -fx-background-color: #e9efff;
+    -fx-background-radius: 8px;
+    -fx-padding: 9px 11px;
+}
+
+.note-icon {
+    -fx-background-color: #d1dcf9;
+    -fx-background-radius: 50px;
+    -fx-min-width: 18px;
+    -fx-min-height: 18px;
+    -fx-alignment: center;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #294fa8;
+}
+
+.note-text {
+    -fx-font-size: 11px;
+    -fx-text-fill: #41567f;
+}
