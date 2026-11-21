@@ -5,6 +5,45 @@
     -fx-border-width: 0 0 1 0;
 }
 
+.top-bar {
+    -fx-background-color: #22252a;
+    -fx-padding: 0 12 0 0;
+}
+
+.about-menu-button {
+    -fx-background-color: #294fa8;
+    -fx-background-radius: 18;
+    -fx-padding: 5 12 5 8;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.about-menu-button:hover {
+    -fx-background-color: #3b62bd;
+}
+
+.about-info-icon {
+    -fx-background-color: white;
+    -fx-background-radius: 50;
+    -fx-min-width: 18;
+    -fx-min-height: 18;
+    -fx-pref-width: 18;
+    -fx-pref-height: 18;
+    -fx-max-width: 18;
+    -fx-max-height: 18;
+}
+
+.about-info-letter {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #294fa8;
+}
+
+.about-button-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+}
+
 .menu-bar .container {
     -fx-spacing: 3;
 }

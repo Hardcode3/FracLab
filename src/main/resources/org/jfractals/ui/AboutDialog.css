@@ -1,0 +1,128 @@
+.about-root {
+    -fx-background-color: #f4f6fb;
+}
+
+.about-hero {
+    -fx-background-color: linear-gradient(to bottom right, #101a3b, #214a91);
+    -fx-padding: 22px 24px;
+}
+
+.app-title {
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+}
+
+.hero-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #d4def8;
+}
+
+.version-pill {
+    -fx-background-color: rgba(255, 255, 255, 0.14);
+    -fx-background-radius: 20px;
+    -fx-padding: 4px 9px;
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #edf2ff;
+}
+
+.about-content {
+    -fx-padding: 20px 24px 22px 24px;
+}
+
+.eyebrow,
+.feature-kicker,
+.detail-label {
+    -fx-font-size: 9px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #65728c;
+}
+
+.intro-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #182033;
+}
+
+.body-copy {
+    -fx-font-size: 12px;
+    -fx-text-fill: #56627a;
+}
+
+.feature-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: #e5e9f2;
+    -fx-border-radius: 10px;
+    -fx-padding: 12px 11px;
+    -fx-min-height: 103px;
+}
+
+.feature-kicker {
+    -fx-text-fill: #516bc1;
+}
+
+.feature-title {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202b43;
+}
+
+.feature-copy {
+    -fx-font-size: 10px;
+    -fx-text-fill: #69758d;
+}
+
+.section-title {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202b43;
+}
+
+.details-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: #e5e9f2;
+    -fx-border-radius: 10px;
+    -fx-padding: 13px;
+}
+
+.detail-label {
+    -fx-font-size: 8px;
+    -fx-text-fill: #7a859a;
+}
+
+.detail-value {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #26334d;
+}
+
+.detail-placeholder {
+    -fx-font-size: 10px;
+    -fx-text-fill: #6d7890;
+}
+
+.about-footer {
+    -fx-padding: 1px 0 0 0;
+}
+
+.github-button {
+    -fx-background-color: #294fa8;
+    -fx-background-radius: 7px;
+    -fx-padding: 9px 15px;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-cursor: hand;
+}
+
+.github-button:hover {
+    -fx-background-color: #1f408f;
+}
+
+.footer-note {
+    -fx-font-size: 10px;
+    -fx-text-fill: #78839a;
+}

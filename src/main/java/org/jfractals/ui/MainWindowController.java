@@ -9,7 +9,9 @@ import org.jfractals.ui.view.FractalViewController;
 
 public class MainWindowController {
     private final FractalExportDialog exportDialog = new FractalExportDialog();
+    private final AboutDialog aboutDialog = new AboutDialog();
     private final OverlayOptions overlayOptions = new OverlayOptions();
+
     @FXML private FractalViewController fractalViewController;
     @FXML private CheckMenuItem showScaleMenuItem;
     @FXML private CheckMenuItem showInfoLabel;
@@ -37,6 +39,10 @@ public class MainWindowController {
 
     @FXML private void showExportDialog() {
         exportDialog.show(fractalViewController);
+    }
+
+    @FXML private void showAboutWindow() {
+        aboutDialog.show();
     }
 
     public void onViewReady(Scene scene) {
