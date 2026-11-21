@@ -37,6 +37,10 @@ public class MainWindowController {
         fractalViewController.showSettings();
     }
 
+    @FXML private void showGoToPosition() {
+        fractalViewController.showGoToPositionDialog();
+    }
+
     @FXML private void showExportDialog() {
         exportDialog.show(fractalViewController);
     }
