@@ -23,6 +23,7 @@ import org.jfractals.ui.overlay.CursorCoordinateTip;
 import org.jfractals.ui.overlay.ScaleBar;
 import org.jfractals.ui.overlay.ViewInfoLabel;
 import org.jfractals.ui.settings.SettingsDialog;
+import org.jfractals.ui.GoToPositionDialog;
 
 public final class FractalViewController implements AutoCloseable {
     private static final double ZOOM_SPEED = 0.005;
@@ -32,6 +33,7 @@ public final class FractalViewController implements AutoCloseable {
     private final FractalRenderService renderService = new FractalRenderService(new FractalRenderer());
     private final PauseTransition renderDebounce = new PauseTransition(RENDER_DEBOUNCE_MS);
     private final SettingsDialog settingsWindow = new SettingsDialog();
+    private final GoToPositionDialog goToPositionDialog = new GoToPositionDialog();
 
     private Viewport viewport = Viewport.initial();
     private List<Node> panLayers;
@@ -79,6 +81,29 @@ public final class FractalViewController implements AutoCloseable {
 
     public void showSettings() {
         settingsWindow.show(fractalPane.getScene().getWindow(), settings);
+    }
+
+    public void showGoToPositionDialog() {
+        goToPositionDialog.show(fractalPane.getScene().getWindow(), this);
+    }
+
+    public Viewport getViewport() {
+        return viewport;
+    }
+
+    public void goToPosition(double centerX, double centerY, double zoomFactor) {
+        if (!Double.isFinite(centerX) || !Double.isFinite(centerY)
+                || !Double.isFinite(zoomFactor) || zoomFactor <= 0.0) {
+            throw new IllegalArgumentException("Coordinates must be finite and zoom must be greater than zero.");
+        }
+        double heightCp = Viewport.DEFAULT_HEIGHT_CP / zoomFactor;
+        if (!Double.isFinite(heightCp) || heightCp <= 0.0) {
+            throw new IllegalArgumentException("Zoom factor is outside the supported range.");
+        }
+        syncViewportSize();
+        viewport = new Viewport(centerX, centerY, viewport.widthPx(), viewport.heightPx(), heightCp);
+        resetPan();
+        render();
     }
 
     public void setViewOptions(OverlayOptions overlayOptions) {
@@ -164,6 +189,7 @@ public final class FractalViewController implements AutoCloseable {
     public void close() {
         renderDebounce.stop();
         settingsWindow.close();
+        goToPositionDialog.close();
         renderService.close();
     }
 }
