@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.jfractals</groupId>
-  <artifactId>jfractals</artifactId>
+  <groupId>org.fraclab</groupId>
+  <artifactId>fraclab</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <name>JFractals</name>
+  <name>FracLab</name>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -57,10 +57,10 @@
             <!-- Default configuration for running with: mvn clean javafx:run -->
             <id>default-cli</id>
             <configuration>
-              <mainClass>org.jfractals/org.jfractals.app.Launcher</mainClass>
-              <launcher>jfractals</launcher>
-              <jlinkZipName>jfractals</jlinkZipName>
-              <jlinkImageName>jfractals</jlinkImageName>
+              <mainClass>org.fraclab/org.fraclab.app.Launcher</mainClass>
+              <launcher>fraclab</launcher>
+              <jlinkZipName>fraclab</jlinkZipName>
+              <jlinkImageName>fraclab</jlinkImageName>
               <noManPages>true</noManPages>
               <stripDebug>true</stripDebug>
               <noHeaderFiles>true</noHeaderFiles>

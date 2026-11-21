@@ -1,0 +1,195 @@
+package org.fraclab.ui.view;
+
+import javafx.animation.PauseTransition;
+import javafx.beans.InvalidationListener;
+import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.Node;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.util.Duration;
+
+import java.util.List;
+import java.util.function.Consumer;
+
+import org.fraclab.model.FractalSettings;
+import org.fraclab.render.FractalRenderService;
+import org.fraclab.render.FractalRenderer;
+import org.fraclab.ui.overlay.OverlayOptions;
+import org.fraclab.ui.overlay.AxisOverlay;
+import org.fraclab.ui.overlay.CursorCoordinateTip;
+import org.fraclab.ui.overlay.ScaleBar;
+import org.fraclab.ui.overlay.ViewInfoLabel;
+import org.fraclab.ui.settings.SettingsDialog;
+import org.fraclab.ui.GoToPositionDialog;
+
+public final class FractalViewController implements AutoCloseable {
+    private static final double ZOOM_SPEED = 0.005;
+    private static final Duration RENDER_DEBOUNCE_MS = Duration.millis(150);
+
+    private final FractalSettings settings = new FractalSettings();
+    private final FractalRenderService renderService = new FractalRenderService(new FractalRenderer());
+    private final PauseTransition renderDebounce = new PauseTransition(RENDER_DEBOUNCE_MS);
+    private final SettingsDialog settingsWindow = new SettingsDialog();
+    private final GoToPositionDialog goToPositionDialog = new GoToPositionDialog();
+
+    private Viewport viewport = Viewport.initial();
+    private List<Node> panLayers;
+    private double pressX;
+    private double pressY;
+
+    @FXML private StackPane fractalPane;
+    @FXML private ImageView fractalImageView;
+    @FXML private AxisOverlay axisOverlay;
+    @FXML private ViewInfoLabel infoLabel;
+    @FXML private ScaleBar scaleBar;
+    @FXML private CursorCoordinateTip cursorTip;
+
+    @FXML
+    private void initialize() {
+        panLayers = List.of(fractalImageView, axisOverlay);
+
+        fractalImageView.fitWidthProperty().bind(fractalPane.widthProperty());
+        fractalImageView.fitHeightProperty().bind(fractalPane.heightProperty());
+
+        renderDebounce.setOnFinished(_ -> render());
+        settings.addListener(_ -> scheduleRender());
+
+        InvalidationListener onResize = _ -> {
+            syncViewportSize();
+            axisOverlay.update(viewport);
+            scheduleRender();
+        };
+        fractalPane.widthProperty().addListener(onResize);
+        fractalPane.heightProperty().addListener(onResize);
+
+        fractalPane.setOnMouseMoved(e -> cursorTip.showAt(e.getX(), e.getY(), viewport));
+        fractalPane.setOnMouseExited(_ -> cursorTip.hide());
+        fractalPane.setOnMousePressed(e -> { pressX = e.getX(); pressY = e.getY(); });
+        fractalPane.setOnMouseDragged(e -> setPanOffset(e.getX() - pressX, e.getY() - pressY));
+        fractalPane.setOnMouseReleased(e -> finishPan(e.getX() - pressX, e.getY() - pressY));
+        fractalPane.setOnScroll(e -> zoomAt(e.getX(), e.getY(), e.getDeltaY()));
+    }
+
+    public void onViewReady(Scene scene) {
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPressed);
+        syncViewportSize();
+        render();
+    }
+
+    public void showSettings() {
+        settingsWindow.show(fractalPane.getScene().getWindow(), settings);
+    }
+
+    public void showGoToPositionDialog() {
+        goToPositionDialog.show(fractalPane.getScene().getWindow(), this);
+    }
+
+    public Viewport getViewport() {
+        return viewport;
+    }
+
+    public void goToPosition(double centerX, double centerY, double zoomFactor) {
+        if (!Double.isFinite(centerX) || !Double.isFinite(centerY)
+                || !Double.isFinite(zoomFactor) || zoomFactor <= 0.0) {
+            throw new IllegalArgumentException("Coordinates must be finite and zoom must be greater than zero.");
+        }
+        double heightCp = Viewport.DEFAULT_HEIGHT_CP / zoomFactor;
+        if (!Double.isFinite(heightCp) || heightCp <= 0.0) {
+            throw new IllegalArgumentException("Zoom factor is outside the supported range.");
+        }
+        syncViewportSize();
+        viewport = new Viewport(centerX, centerY, viewport.widthPx(), viewport.heightPx(), heightCp);
+        resetPan();
+        render();
+    }
+
+    public void setViewOptions(OverlayOptions overlayOptions) {
+        scaleBar.visibleProperty().bind(overlayOptions.getShowScaleProperty());
+        infoLabel.visibleProperty().bind(overlayOptions.getShowInfoLabelProperty());
+        infoLabel.getShowCenterCoordinatesProperty().bind(overlayOptions.getShowCenterCoordinatesProperty());
+        infoLabel.getShowZoomProperty().bind(overlayOptions.getShowZoomProperty());
+        axisOverlay.visibleProperty().bind(overlayOptions.getShowAxesProperty());
+    }
+
+    private void handleKeyPressed(KeyEvent event) {
+        switch (event.getCode()) {
+            case R -> resetView();
+            case S -> showSettings();
+            default -> { return; }
+        }
+        event.consume();
+    }
+
+    private void finishPan(double dxPx, double dyPx) {
+        if (viewport.isInitial() || (dxPx == 0.0 && dyPx == 0.0)) {
+            resetPan();
+            return;
+        }
+        viewport = viewport.panned(dxPx, dyPx);
+        render();
+    }
+
+    private void zoomAt(double x, double y, double scrollDelta) {
+        if (viewport.isInitial() || scrollDelta == 0.0) return;
+        viewport = viewport.zoomedAt(x, y, Math.exp(scrollDelta * ZOOM_SPEED));
+        render();
+    }
+
+    public void resetView() {
+        viewport = viewport.reset();
+        resetPan();
+        render();
+    }
+
+    private void setPanOffset(double dxPx, double dyPx) {
+        for (Node layer : panLayers) {
+            layer.setTranslateX(dxPx);
+            layer.setTranslateY(dyPx);
+        }
+    }
+
+    private void resetPan() {
+        setPanOffset(0, 0);
+    }
+
+    private void syncViewportSize() {
+        viewport = viewport.withSize(fractalPane.getWidth(), fractalPane.getHeight());
+    }
+
+    private void scheduleRender() {
+        renderDebounce.playFromStart();
+    }
+
+    private void render() {
+        Viewport vp = viewport;
+        infoLabel.update(vp);
+        scaleBar.update(vp);
+        Consumer<WritableImage> onRendered = image -> {
+            fractalImageView.setImage(image);
+            resetPan();
+            axisOverlay.update(vp);
+        };
+        renderService.render(
+                (int) vp.widthPx(), (int) vp.heightPx(),
+                vp.heightCp(),
+                vp.centerXCp(), vp.centerYCp(),
+                settings.snapshot(),
+                onRendered
+        );
+    }
+
+    public FractalViewState getRenderState() {
+        return new FractalViewState(viewport, settings.snapshot());
+    }
+
+    @Override
+    public void close() {
+        renderDebounce.stop();
+        settingsWindow.close();
+        goToPositionDialog.close();
+        renderService.close();
+    }
+}
