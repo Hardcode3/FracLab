@@ -2,7 +2,6 @@ module org.jfractals {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.swing;
-    requires commons.math3;
     requires java.desktop;
 
     opens org.jfractals.ui.export to javafx.fxml;
