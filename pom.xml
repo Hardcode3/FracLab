@@ -9,13 +9,39 @@
   <version>1.0-SNAPSHOT</version>
   <name>FracLab</name>
 
+  <!-- ================================================================== -->
+  <!-- Properties                                                         -->
+  <!-- ================================================================== -->
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>25</maven.compiler.release>
+
+    <!-- Application metadata, shared by javafx:run and jpackage -->
+    <app.name>FracLab</app.name>
+    <app.vendor>FracLab</app.vendor>
+    <app.description>Explore Mandelbrot and Julia sets</app.description>
+    <app.main>org.fraclab/org.fraclab.app.Launcher</app.main>
+
+    <!-- Dependency versions -->
     <javafx.version>21.0.6</javafx.version>
     <junit.version>6.1.3</junit.version>
+
+    <!-- Plugin versions -->
+    <compiler-plugin.version>3.15.0</compiler-plugin.version>
+    <surefire-plugin.version>3.6.1</surefire-plugin.version>
+    <javafx-plugin.version>0.0.8</javafx-plugin.version>
+    <build-helper-plugin.version>3.8.0</build-helper-plugin.version>
+    <clean-plugin.version>3.5.0</clean-plugin.version>
+    <dependency-plugin.version>3.11.0</dependency-plugin.version>
+    <exec-plugin.version>3.7.0</exec-plugin.version>
+
+    <!-- Overridden to .exe by the windows profile, where JDK tools are run by their full file name. -->
+    <exe.suffix></exe.suffix>
   </properties>
 
+  <!-- ================================================================== -->
+  <!-- Dependencies                                                       -->
+  <!-- ================================================================== -->
   <dependencies>
     <dependency>
       <groupId>org.openjfx</groupId>
@@ -35,6 +61,9 @@
     </dependency>
   </dependencies>
 
+  <!-- ================================================================== -->
+  <!-- Build: compile, test, run (mvn clean javafx:run)                   -->
+  <!-- ================================================================== -->
   <build>
     <resources>
       <!-- Only properties files are filtered, so that ${project.version} reaches the About dialog
@@ -59,18 +88,28 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.15.0</version>
+        <version>${compiler-plugin.version}</version>
       </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire-plugin.version}</version>
+        <configuration>
+          <useModulePath>false</useModulePath>
+        </configuration>
+      </plugin>
+
       <plugin>
         <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
-        <version>0.0.8</version>
+        <version>${javafx-plugin.version}</version>
         <executions>
           <execution>
             <!-- Default configuration for running with: mvn clean javafx:run -->
             <id>default-cli</id>
             <configuration>
-              <mainClass>org.fraclab/org.fraclab.app.Launcher</mainClass>
+              <mainClass>${app.main}</mainClass>
               <options>
                 <!-- JavaFX loads its native libraries itself; this silences the JDK warning. -->
                 <option>--enable-native-access=javafx.graphics</option>
@@ -85,14 +124,215 @@
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.6.1</version>
-        <configuration>
-          <useModulePath>false</useModulePath>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!-- ================================================================== -->
+    <!-- Profile "dist": native packaging with jpackage                     -->
+    <!--   mvn -Pdist clean package                                         -->
+    <!-- ================================================================== -->
+    <!-- Builds, for the current operating system and architecture only:
+           target/dist/FracLab-<version>-<os>-<arch>.(zip|tar.gz)  standalone application, no installation needed
+           target/dist/<installer>                                  native installer (dmg, msi, deb or rpm)
+         Platform-specific options live in src/packaging/<os>/app-image.args and installer.args.
+         Steps, in order: parse version -> clean output -> copy modules -> app image -> installer -> archive. -->
+    <profile>
+      <id>dist</id>
+      <properties>
+        <!-- jpackage only accepts numeric versions, so 1.2-SNAPSHOT becomes 1.2.0. -->
+        <app.version>${parsedVersion.majorVersion}.${parsedVersion.minorVersion}.${parsedVersion.incrementalVersion}</app.version>
+        <jpackage.dir>${project.build.directory}/jpackage</jpackage.dir>
+        <dist.dir>${project.build.directory}/dist</dist.dir>
+        <dist.archive.name>${app.name}-${app.version}-${packaging.os}-${os.arch}</dist.archive.name>
+      </properties>
+      <build>
+        <plugins>
+          <!-- Step 1: expose parsedVersion.* for app.version -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>${build-helper-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>parse-version</id>
+                <goals>
+                  <goal>parse-version</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Step 2: jpackage refuses to write into existing output, so packaging always starts from scratch. -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>${clean-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>clean-packaging-output</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>clean</goal>
+                </goals>
+                <configuration>
+                  <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                  <filesets>
+                    <fileset><directory>${jpackage.dir}</directory></fileset>
+                    <fileset><directory>${dist.dir}</directory></fileset>
+                  </filesets>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Step 3: gather runtime dependencies as modules for jpackage -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <version>${dependency-plugin.version}</version>
+            <executions>
+              <execution>
+                <id>copy-modules</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>copy-dependencies</goal>
+                </goals>
+                <configuration>
+                  <includeScope>runtime</includeScope>
+                  <outputDirectory>${jpackage.dir}/modules</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <!-- Steps 4-6: run jpackage twice, then archive the app image -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <version>${exec-plugin.version}</version>
+            <configuration>
+              <workingDirectory>${project.basedir}</workingDirectory>
+            </configuration>
+            <executions>
+              <!-- Step 4: self-contained application with its own trimmed Java runtime and a native launcher. -->
+              <execution>
+                <id>app-image</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>${java.home}/bin/jpackage${exe.suffix}</executable>
+                  <arguments>
+                    <argument>--type</argument><argument>app-image</argument>
+                    <argument>--dest</argument><argument>${jpackage.dir}/image</argument>
+                    <argument>--name</argument><argument>${app.name}</argument>
+                    <argument>--app-version</argument><argument>${app.version}</argument>
+                    <argument>--vendor</argument><argument>${app.vendor}</argument>
+                    <argument>--description</argument><argument>${app.description}</argument>
+                    <argument>--module-path</argument><argument>${jpackage.dir}/modules</argument>
+                    <argument>--module-path</argument><argument>${project.build.directory}/${project.build.finalName}.jar</argument>
+                    <argument>--module</argument><argument>${app.main}</argument>
+                    <argument>--java-options</argument><argument>--enable-native-access=javafx.graphics</argument>
+                    <!-- JavaFX 21 still uses sun.misc.Unsafe, which prints warnings on JDK 24 and newer. -->
+                    <argument>--java-options</argument><argument>--sun-misc-unsafe-memory-access=allow</argument>
+                    <argument>@src/packaging/${packaging.os}/app-image.args</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+
+              <!-- Step 5: native installer built from the app image -->
+              <execution>
+                <id>installer</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>${java.home}/bin/jpackage${exe.suffix}</executable>
+                  <arguments>
+                    <argument>--type</argument><argument>${installer.type}</argument>
+                    <argument>--app-image</argument><argument>${jpackage.dir}/image/${app.image.name}</argument>
+                    <argument>--dest</argument><argument>${dist.dir}</argument>
+                    <argument>--name</argument><argument>${app.name}</argument>
+                    <argument>--app-version</argument><argument>${app.version}</argument>
+                    <argument>--vendor</argument><argument>${app.vendor}</argument>
+                    <argument>--description</argument><argument>${app.description}</argument>
+                    <argument>@src/packaging/${packaging.os}/installer.args</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+
+              <!-- Step 6: zips the application image as a portable, no-install download. -->
+              <execution>
+                <id>archive</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <configuration>
+                  <executable>${archive.executable}</executable>
+                  <commandlineArgs>${archive.args}</commandlineArgs>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- ================================================================== -->
+    <!-- Per-platform profiles (auto-activated by the build OS)             -->
+    <!-- ================================================================== -->
+    <!-- Settings used by the dist profile. The installer type can be overridden,
+         for example with -Dinstaller.type=rpm or -Dinstaller.type=pkg. -->
+
+    <!-- macOS -->
+    <profile>
+      <id>macos</id>
+      <activation>
+        <os><family>mac</family></os>
+      </activation>
+      <properties>
+        <packaging.os>macos</packaging.os>
+        <installer.type>dmg</installer.type>
+        <app.image.name>FracLab.app</app.image.name>
+        <!-- ditto keeps the bundle's permissions and metadata, which a plain zip tool may lose. -->
+        <archive.executable>ditto</archive.executable>
+        <archive.args>-c -k --keepParent target/jpackage/image/FracLab.app target/dist/${dist.archive.name}.zip</archive.args>
+      </properties>
+    </profile>
+
+    <!-- Windows -->
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os><family>windows</family></os>
+      </activation>
+      <properties>
+        <packaging.os>windows</packaging.os>
+        <exe.suffix>.exe</exe.suffix>
+        <installer.type>msi</installer.type>
+        <app.image.name>FracLab</app.image.name>
+        <archive.executable>${java.home}/bin/jar${exe.suffix}</archive.executable>
+        <archive.args>--create --no-manifest --file target/dist/${dist.archive.name}.zip -C target/jpackage/image FracLab</archive.args>
+      </properties>
+    </profile>
+
+    <!-- Linux -->
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os><name>Linux</name></os>
+      </activation>
+      <properties>
+        <packaging.os>linux</packaging.os>
+        <installer.type>deb</installer.type>
+        <app.image.name>FracLab</app.image.name>
+        <archive.executable>tar</archive.executable>
+        <archive.args>-czf target/dist/${dist.archive.name}.tar.gz -C target/jpackage/image FracLab</archive.args>
+      </properties>
+    </profile>
+  </profiles>
 </project>

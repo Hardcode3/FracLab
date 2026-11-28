@@ -1,0 +1,4 @@
+--icon src/packaging/macos/FracLab.icns
+--mac-package-identifier org.fraclab.FracLab
+--mac-package-name FracLab
+--mac-app-category education

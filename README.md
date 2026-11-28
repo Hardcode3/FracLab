@@ -12,17 +12,39 @@ mvn javafx:run
 
 You can drag to pan, scroll to zoom, press **R** to reset the view, and press **S** to open settings.
 
-## Build a standalone application
+## Package the application
 
-Install JDK 25 or newer and Maven. Build a self-contained application image for the current operating system with:
+Install JDK 25 or newer and Maven, then run:
 
 ```sh
-mvn clean javafx:jlink
+mvn -Pdist clean package
 ```
 
-The runnable image is created in `target/fraclab/`, and the same image is zipped as `target/fraclab.zip`. It includes a Java runtime, so users do not need to install Java separately. This command builds only for the operating system and architecture on which it runs.
+This builds two downloads in `target/dist/` for the operating system and processor of the machine running the build. Both include a trimmed Java runtime, so users do not need to install Java.
 
-To build bundles for Windows x64, Linux x64, and both Intel and Apple Silicon Macs, open the repository's **Actions → Package app** workflow and choose **Run workflow**. Download the matching `fraclab-*` artifact from the completed run. Tagging a commit with a name such as `v1.0.0` also starts these builds.
+| Platform | Standalone (no installation) | Installer |
+| --- | --- | --- |
+| macOS | `FracLab-<version>-macos-<arch>.zip`, containing `FracLab.app` | `FracLab-<version>.dmg` |
+| Windows | `FracLab-<version>-windows-<arch>.zip`, containing `FracLab\FracLab.exe` | `FracLab-<version>.msi` |
+| Linux | `FracLab-<version>-linux-<arch>.tar.gz`, containing `FracLab/bin/FracLab` | `fraclab_<version>_<arch>.deb` |
+
+The packages use the version in `pom.xml` without its qualifier, so `1.0-SNAPSHOT` becomes `1.0.0`. Platform-specific packaging options and icons are in `src/packaging/<os>/`.
+
+Some installers need extra tools:
+
+- **Windows:** the [WiX Toolset](https://wixtoolset.org) 5, installed with `dotnet tool install --global wix --version 5.0.2` and then `wix extension add --global WixToolset.UI.wixext/5.0.2 WixToolset.Util.wixext/5.0.2`.
+- **Linux:** `fakeroot` for `.deb` packages. To build an `.rpm` package instead, install `rpm` and add `-Dinstaller.type=rpm`.
+- **macOS:** nothing. Add `-Dinstaller.type=pkg` to build a `.pkg` installer instead of a disk image.
+
+The macOS and Windows packages are not code-signed. On first launch, macOS users must Control-click the app and choose **Open**, and Windows SmartScreen asks users to confirm.
+
+The value of `--win-upgrade-uuid` in `src/packaging/windows/installer.args` must never change. Windows uses it to recognize an installed FracLab and replace it with a newer version.
+
+### Build for every platform
+
+Open the repository's **Actions → Package app** workflow and choose **Run workflow**. It builds the packages for Windows x64, Linux x64 (including an `.rpm`), and Intel and Apple Silicon Macs. Download them from the `fraclab-*` artifacts of the completed run.
+
+Pushing a tag such as `v1.2.0` runs the same builds with the version set to `1.2.0`, then creates a draft GitHub release with every package attached. Review the draft and publish it from the repository's **Releases** page.
 
 ## Project layout
 
