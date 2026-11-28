@@ -3,11 +3,12 @@ package org.fraclab.ui.overlay;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import org.fraclab.ui.view.Viewport;
+import org.fraclab.model.Viewport;
 
+/** Draws the real and imaginary axes of the complex plane over the fractal. */
 public final class AxisOverlay extends Pane {
-    private final static Color AXIS_COLOR = Color.GRAY;
-    private final static double AXIS_WIDTH = 1.5d;
+    private static final Color AXIS_COLOR = Color.GRAY;
+    private static final double AXIS_WIDTH = 1.5d;
 
     private final Line xAxis = newAxis();
     private final Line yAxis = newAxis();
@@ -18,13 +19,13 @@ public final class AxisOverlay extends Pane {
     }
 
     public void update(Viewport viewport) {
-        if (viewport.isInitial()) return;
-
         final double originXPx = viewport.toScreenX(0.0d);
         final double originYPx = viewport.toScreenY(0.0d);
 
-        final boolean yAxisIsInViewport = originXPx >= 0 && originYPx <= viewport.heightPx();
-        final boolean xAxisIsInViewport = originYPx >= 0 && originYPx <= viewport.widthPx();
+        // The imaginary (vertical) axis is visible when the origin is horizontally within the view,
+        // and the real (horizontal) axis when it is vertically within the view.
+        final boolean yAxisIsInViewport = originXPx >= 0 && originXPx <= viewport.widthPx();
+        final boolean xAxisIsInViewport = originYPx >= 0 && originYPx <= viewport.heightPx();
 
         yAxis.setVisible(yAxisIsInViewport);
         yAxis.setStartX(originXPx);
@@ -44,9 +45,8 @@ public final class AxisOverlay extends Pane {
         line.setStroke(AXIS_COLOR);
         line.setStrokeWidth(AXIS_WIDTH);
 
-        // Axis are independent of the parent layout and manually positioned.
-        // Therefore, their layout should not be recomputed when parent's layout updates.
-        // Also saves CPU cycles.
+        // Axes are positioned manually, independently of the parent layout.
+        // Therefore, their layout should not be recomputed when the parent's layout updates.
         line.setManaged(false);
         return line;
     }

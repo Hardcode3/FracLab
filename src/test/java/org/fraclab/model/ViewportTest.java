@@ -1,11 +1,10 @@
-package org.fraclab.ui.view;
+package org.fraclab.model;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.fraclab.ui.view.Viewport;
 
 public class ViewportTest {
     private final double EPS = 1e-9;
@@ -129,12 +128,6 @@ public class ViewportTest {
         assertEquals(Viewport.DEFAULT_HEIGHT_CP, reset.heightCp());
         assertEquals(vp.widthPx(), reset.widthPx());
         assertEquals(vp.heightPx(), reset.heightPx());
-    }
-
-    @Test
-    void viewportIsInitialUntilSomeFieldIsDifferentFromDefaults() {
-        assertTrue(Viewport.initial().isInitial());
-        assertFalse(Viewport.initial().withSize(Viewport.DEFAULT_WIDTH_PX + 1.0, Viewport.DEFAULT_HEIGHT_PX).isInitial());
     }
 
     @Test

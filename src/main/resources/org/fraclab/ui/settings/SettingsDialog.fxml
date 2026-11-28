@@ -6,17 +6,17 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="org.fraclab.ui.settings.SettingsDialogController"
-      stylesheets="@SettingsDialog.css"
-      styleClass="settings-root"
+      stylesheets="@../Dialog.css, @SettingsDialog.css"
+      styleClass="dialog-root, settings-root"
       prefWidth="430" minWidth="400">
-    <VBox styleClass="settings-hero" spacing="5">
-        <Label text="FRACLAB  /  CONFIGURATION" styleClass="settings-eyebrow"/>
-        <Label text="Fractal settings" styleClass="settings-title"/>
-        <Label text="Shape the details of your next exploration." styleClass="settings-subtitle"/>
+    <VBox styleClass="dialog-hero" spacing="5">
+        <Label text="FRACLAB  /  CONFIGURATION" styleClass="dialog-eyebrow"/>
+        <Label text="Fractal settings" styleClass="dialog-title"/>
+        <Label text="Shape the details of your next exploration." styleClass="dialog-subtitle"/>
     </VBox>
 
-    <VBox styleClass="settings-content" spacing="12">
-        <GridPane hgap="14" vgap="12" styleClass="settings-form">
+    <VBox styleClass="dialog-content" spacing="12">
+        <GridPane hgap="14" vgap="12" styleClass="dialog-card">
             <columnConstraints>
                 <ColumnConstraints minWidth="145" hgrow="NEVER"/>
                 <ColumnConstraints hgrow="ALWAYS"/>
@@ -36,7 +36,7 @@
             <Label text="Julia imaginary constant" styleClass="field-label" GridPane.rowIndex="6" GridPane.columnIndex="0"/>
             <Spinner fx:id="juliaImagSpinner" editable="true" maxWidth="Infinity" GridPane.rowIndex="6" GridPane.columnIndex="1"/>
         </GridPane>
-        <HBox styleClass="settings-note" spacing="9" alignment="CENTER_LEFT">
+        <HBox styleClass="dialog-note" spacing="9" alignment="CENTER_LEFT">
             <Label text="i" styleClass="note-icon"/>
             <Label text="Changes apply as you adjust the settings." styleClass="note-text" wrapText="true"/>
         </HBox>

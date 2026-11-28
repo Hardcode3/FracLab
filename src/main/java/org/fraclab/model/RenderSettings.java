@@ -3,9 +3,9 @@ package org.fraclab.model;
 import java.util.Objects;
 
 /**
- * Immutable snapshot of the parameters needed for one render.
- * The mutable version of this class lays in org.fraclab.model.FractalSettings.
- * */
+ * Immutable, thread-safe snapshot of the parameters needed for one render.
+ * The mutable model edited by the user is {@link FractalSettings}.
+ */
 public record RenderSettings(
         FractalType type,
         int maxIterations,

@@ -1,58 +1,85 @@
 package org.fraclab.ui.export;
 
-import java.io.File;
-import java.util.function.IntConsumer;
-import java.util.function.UnaryOperator;
-
+import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
-import org.fraclab.ui.view.FractalViewController;
-import org.fraclab.utils.FileUtils;
+import javafx.stage.Screen;
+import org.fraclab.export.FractalImageExporter;
+import org.fraclab.export.ImageFormat;
+import org.fraclab.render.FractalRenderer;
+import org.fraclab.render.RenderRequest;
+import org.fraclab.ui.Spinners;
 
-public class FractalExportDialogController {
-    private FractalViewController fractalViewController;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.util.concurrent.CompletionException;
+import java.util.function.IntConsumer;
+import java.util.function.Supplier;
+
+/**
+ * Exports the current view of the fractal to an image file, at a size and in a format chosen by the user.
+ * The view is captured when the export starts, and the export runs in the background.
+ */
+public final class FractalExportDialogController {
+    private static final System.Logger LOGGER = System.getLogger(FractalExportDialogController.class.getName());
+
+    private final FractalImageExporter exporter = new FractalImageExporter(new FractalRenderer());
+
+    private FractalExportSettings settings;
+    private Supplier<RenderRequest> currentView;
     private boolean syncingControls;
-
-    private final FractalExportService exportService = new FractalExportService();
-    private final FractalExportSettings settings = new FractalExportSettings();
-    private static final UnaryOperator<TextFormatter.Change> SPINNER_INTEGER_FILTER = change -> change.getControlNewText().matches("\\d{0,6}") ? change : null;
 
     @FXML private TextField exportPathTextField;
     @FXML private Spinner<Integer> widthSpinner;
     @FXML private Spinner<Integer> heightSpinner;
     @FXML private Spinner<Integer> aspectRatioWidthSpinner;
     @FXML private Spinner<Integer> aspectRatioHeightSpinner;
-    @FXML private ComboBox<FractalExportImageExtension> imageExtensionCombo;
+    @FXML private ComboBox<ImageFormat> imageFormatCombo;
     @FXML private Label exportStatus;
     @FXML private Button exportButton;
 
     @FXML
     private void initialize() {
-        widthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(100, Integer.MAX_VALUE));
-        widthSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
-        heightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(100, Integer.MAX_VALUE));
-        heightSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
-        aspectRatioWidthSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
-        aspectRatioWidthSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
-        aspectRatioHeightSpinner.setValueFactory(new SpinnerValueFactory.IntegerSpinnerValueFactory(1, Integer.MAX_VALUE));
-        aspectRatioHeightSpinner.getEditor().setTextFormatter(new TextFormatter<String>(SPINNER_INTEGER_FILTER));
+        // Defaults to an image of the size of the screen.
+        Rectangle2D screen = Screen.getPrimary().getBounds();
+        settings = new FractalExportSettings((int) Math.round(screen.getWidth()), (int) Math.round(screen.getHeight()),
+                FractalExportSettings.defaultOutputFile());
 
+        Spinners.integer(widthSpinner, FractalExportSettings.MIN_SIZE_PX, FractalExportSettings.MAX_SIZE_PX);
+        Spinners.integer(heightSpinner, FractalExportSettings.MIN_SIZE_PX, FractalExportSettings.MAX_SIZE_PX);
+        Spinners.integer(aspectRatioWidthSpinner, FractalExportSettings.MIN_RATIO_TERM, FractalExportSettings.MAX_RATIO_TERM);
+        Spinners.integer(aspectRatioHeightSpinner, FractalExportSettings.MIN_RATIO_TERM, FractalExportSettings.MAX_RATIO_TERM);
+        refreshSizeControls();
         connect(widthSpinner, settings::setWidthPx);
         connect(heightSpinner, settings::setHeightPx);
         connect(aspectRatioWidthSpinner, settings::setAspectRatioWidth);
         connect(aspectRatioHeightSpinner, settings::setAspectRatioHeight);
 
-        imageExtensionCombo.getItems().setAll(FractalExportImageExtension.values());
-        imageExtensionCombo.setValue(settings.getImageExtension());
-        imageExtensionCombo.valueProperty().addListener((_, _, newValue) -> updateExportPathExtension(newValue));
+        imageFormatCombo.getItems().setAll(ImageFormat.values());
+        imageFormatCombo.setValue(settings.getFormat());
+        imageFormatCombo.valueProperty().addListener((_, _, newFormat) -> changeFormat(newFormat));
 
-        exportPathTextField.textProperty().addListener((_, _, newValue) -> settings.setFPath(newValue));
+        exportPathTextField.setText(settings.getOutputFile().toString());
+        exportPathTextField.textProperty().addListener((_, _, newText) -> settings.setOutputFile(toPath(newText)));
     }
 
-    public void onViewReady() {
-        refreshControlsFromSettings();
-        updateExportPathTextField(settings.getFpathString());
+    /** Called once by the window that loads this controller, with what to export. */
+    public void init(Supplier<RenderRequest> currentView) {
+        this.currentView = currentView;
+    }
+
+    /** Called once the dialog is shown, so that the end of the file name is visible and no field has focus. */
+    public void onShown() {
+        exportPathTextField.getScene().getRoot().requestFocus();
+        exportPathTextField.end();
     }
 
     private void connect(Spinner<Integer> spinner, IntConsumer setter) {
@@ -61,11 +88,12 @@ public class FractalExportDialogController {
                 return;
             }
             setter.accept(newValue);
-            refreshControlsFromSettings();
+            refreshSizeControls();
         });
     }
 
-    private void refreshControlsFromSettings() {
+    /** Shows the size and ratio, which may have been adjusted by the settings after an edit. */
+    private void refreshSizeControls() {
         syncingControls = true;
         try {
             widthSpinner.getValueFactory().setValue(settings.getWidthPx());
@@ -77,50 +105,81 @@ public class FractalExportDialogController {
         }
     }
 
-    public void setFractalViewController(FractalViewController fractalViewController) {
-        this.fractalViewController = fractalViewController;
-    }
-
-    private void updateExportPathTextField(String newPath) {
-        exportPathTextField.setText(newPath);
-        exportPathTextField.positionCaret(newPath.length());
-    }
-
-    private void updateExportPathExtension(FractalExportImageExtension newExtension) {
-        if (newExtension == null) {
+    private void changeFormat(ImageFormat newFormat) {
+        if (newFormat == null) {
             return;
         }
-        settings.setImageExtension(newExtension);
-        String fileWithNewExtension = FileUtils.replaceFileExtension(settings.getFpathString(), newExtension.toString());
-        updateExportPathTextField(fileWithNewExtension);
+        settings.setFormat(newFormat);
+        Path outputFile = settings.getOutputFile();
+        if (outputFile != null) {
+            showOutputFile(newFormat.applyTo(outputFile));
+        }
+    }
+
+    private void showOutputFile(Path file) {
+        exportPathTextField.setText(file.toString());
+        exportPathTextField.end();
     }
 
     @FXML
     private void onBrowseClicked() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose a file to export the fractal");
-        fileChooser.setInitialDirectory(settings.getFpath().getParentFile());
-        fileChooser.setInitialFileName(settings.getFpath().getName());
-        var filter = new FileChooser.ExtensionFilter("Images", FractalExportImageExtension.getAllPatterns());
-        fileChooser.getExtensionFilters().add(filter);
-        File selectedFile = fileChooser.showSaveDialog(null);
+        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Images", ImageFormat.allFilePatterns()));
+        Path outputFile = settings.getOutputFile();
+        if (outputFile != null) {
+            Path folder = outputFile.toAbsolutePath().getParent();
+            if (folder != null && Files.isDirectory(folder)) {
+                fileChooser.setInitialDirectory(folder.toFile());
+            }
+            fileChooser.setInitialFileName(String.valueOf(outputFile.getFileName()));
+        }
+        File selectedFile = fileChooser.showSaveDialog(exportButton.getScene().getWindow());
         if (selectedFile == null) {
             return;
         }
-        String path = selectedFile.getAbsolutePath();
-        updateExportPathTextField(path);
+        // The file content must match its extension: follow a known extension, otherwise add the current one.
+        Path selected = selectedFile.toPath();
+        ImageFormat.fromFileName(selectedFile.getName()).ifPresentOrElse(
+                format -> {
+                    showOutputFile(selected);
+                    imageFormatCombo.setValue(format);
+                },
+                () -> showOutputFile(settings.getFormat().applyTo(selected)));
     }
 
-    @FXML void onExportClicked() {
-        if (!settings.isFPathValid() || exportButton.isDisabled()) {
+    @FXML
+    private void onExportClicked() {
+        if (!settings.isOutputFileValid()) {
+            exportStatus.setText("Choose a file name in an existing folder you can write to.");
             return;
         }
+        RenderRequest request = currentView.get().withSize(settings.getWidthPx(), settings.getHeightPx());
         exportButton.setDisable(true);
         exportStatus.setText("Currently exporting...");
-        Runnable onRendered = () -> {
+        exporter.export(request, settings.getFormat(), settings.getOutputFile())
+                .whenCompleteAsync((_, error) -> onExportFinished(request, error), Platform::runLater);
+    }
+
+    private void onExportFinished(RenderRequest request, Throwable error) {
+        exportButton.setDisable(false);
+        if (error == null) {
             exportStatus.setText("Export completed successfully! Idle.");
-            exportButton.setDisable(false);
-        };
-        exportService.export(fractalViewController.getRenderState(), settings, onRendered);
+            return;
+        }
+        Throwable cause = error instanceof CompletionException && error.getCause() != null ? error.getCause() : error;
+        LOGGER.log(System.Logger.Level.ERROR, "Fractal export failed", cause);
+        String reason = cause instanceof OutOfMemoryError
+                ? "not enough memory for a " + request.widthPx() + " × " + request.heightPx() + " image."
+                : String.valueOf(cause.getMessage());
+        exportStatus.setText("Export failed: " + reason);
+    }
+
+    private static Path toPath(String text) {
+        try {
+            return text == null || text.isBlank() ? null : Path.of(text.strip());
+        } catch (InvalidPathException e) {
+            return null;
+        }
     }
 }

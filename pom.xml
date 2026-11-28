@@ -11,42 +11,55 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.release>25</maven.compiler.release>
+    <javafx.version>21.0.6</javafx.version>
+    <junit.version>6.1.3</junit.version>
   </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
-      <version>21.0.6</version>
+      <version>${javafx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
-      <version>21.0.6</version>
-    </dependency>
-    <dependency>
-      <groupId>org.openjfx</groupId>
-      <artifactId>javafx-swing</artifactId>
-        <version>21.0.6</version>
+      <version>${javafx.version}</version>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>6.1.3</version>
+      <version>${junit.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
 
-
   <build>
+    <resources>
+      <!-- Only properties files are filtered, so that ${project.version} reaches the About dialog
+           without risking corruption of binary resources such as images. -->
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.properties</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.properties</exclude>
+        </excludes>
+      </resource>
+    </resources>
+
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.15.0</version>
-        <configuration>
-          <release>25</release>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.openjfx</groupId>
@@ -58,6 +71,10 @@
             <id>default-cli</id>
             <configuration>
               <mainClass>org.fraclab/org.fraclab.app.Launcher</mainClass>
+              <options>
+                <!-- JavaFX loads its native libraries itself; this silences the JDK warning. -->
+                <option>--enable-native-access=javafx.graphics</option>
+              </options>
               <launcher>fraclab</launcher>
               <jlinkZipName>fraclab</jlinkZipName>
               <jlinkImageName>fraclab</jlinkImageName>
@@ -69,6 +86,7 @@
         </executions>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <version>3.6.1</version>
         <configuration>

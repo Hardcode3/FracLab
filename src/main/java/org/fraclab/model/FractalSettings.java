@@ -12,9 +12,9 @@ import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
 /**
- * Mutable JavaFX model for the settings edited by the user.
- * Immutable version of this class lays in org.fraclab.model.RenderSettings.
- * */
+ * Mutable JavaFX model for the fractal settings edited by the user.
+ * Use {@link #snapshot()} to obtain the immutable {@link RenderSettings} given to renderers.
+ */
 public final class FractalSettings {
     private final ObjectProperty<FractalType> type = new SimpleObjectProperty<>(this, "type", FractalType.MANDELBROT);
     private final IntegerProperty maxIterations = new SimpleIntegerProperty(this, "maxIterations", 18);
