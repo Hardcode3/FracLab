@@ -18,7 +18,7 @@
 
     <!-- Application metadata, shared by javafx:run and jpackage -->
     <app.name>FracLab</app.name>
-    <app.vendor>FracLab</app.vendor>
+    <app.vendor>Hardcode3</app.vendor>
     <app.description>Explore Mandelbrot and Julia sets</app.description>
     <app.copyright>Copyright (c) 2026 Baptiste Penot</app.copyright>
     <app.main>org.fraclab/org.fraclab.app.Launcher</app.main>
