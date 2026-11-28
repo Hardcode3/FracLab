@@ -8,17 +8,18 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.fraclab.ui.AboutDialogController"
+      fx:controller="org.fraclab.ui.about.AboutDialogController"
       stylesheets="@AboutDialog.css"
       styleClass="about-root"
       prefWidth="560">
 
     <VBox styleClass="about-hero">
-        <GridPane fx:id="headerGridPane" prefHeight="94" minHeight="94" maxHeight="94">
+        <GridPane prefHeight="94" minHeight="94" maxHeight="94">
             <columnConstraints>
                 <ColumnConstraints minWidth="96" prefWidth="96" hgrow="NEVER"/>
                 <ColumnConstraints hgrow="ALWAYS"/>
@@ -26,17 +27,19 @@
             <rowConstraints>
                 <RowConstraints minHeight="94" prefHeight="94" vgrow="NEVER"/>
             </rowConstraints>
-            <ImageView fx:id="appLogoImageView"
-                       fitWidth="88"
+            <ImageView fitWidth="88"
+                       fitHeight="94"
                        preserveRatio="true"
                        smooth="true"
                        GridPane.columnIndex="0"
                        GridPane.halignment="LEFT"
-                       GridPane.valignment="CENTER"/>
+                       GridPane.valignment="CENTER">
+                <Image url="@../AppLogo.png"/>
+            </ImageView>
             <VBox spacing="6" alignment="CENTER_LEFT" GridPane.columnIndex="1">
                 <Label text="FracLab" styleClass="app-title"/>
                 <Label text="A desktop studio for fractal exploration" styleClass="hero-subtitle" wrapText="true"/>
-                <Label text="v1.0-SNAPSHOT" styleClass="version-pill"/>
+                <Label fx:id="heroVersionLabel" styleClass="version-pill"/>
             </VBox>
         </GridPane>
     </VBox>
@@ -78,7 +81,7 @@
 
                 <Label text="VERSION" styleClass="detail-label" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
                 <Label text="LICENSE" styleClass="detail-label" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
-                <Label text="v1.0-SNAPSHOT" styleClass="detail-value" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <Label fx:id="versionLabel" styleClass="detail-value" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
                 <Label text="MIT License" styleClass="detail-value" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
 
                 <Label text="MAINTAINER" styleClass="detail-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>

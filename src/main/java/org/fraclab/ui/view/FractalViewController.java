@@ -3,37 +3,34 @@ package org.fraclab.ui.view;
 import javafx.animation.PauseTransition;
 import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
-import javafx.scene.Scene;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
-
-import java.util.List;
-import java.util.function.Consumer;
-
 import org.fraclab.model.FractalSettings;
+import org.fraclab.model.Viewport;
 import org.fraclab.render.FractalRenderService;
 import org.fraclab.render.FractalRenderer;
-import org.fraclab.ui.overlay.OverlayOptions;
+import org.fraclab.render.RenderRequest;
 import org.fraclab.ui.overlay.AxisOverlay;
 import org.fraclab.ui.overlay.CursorCoordinateTip;
+import org.fraclab.ui.overlay.OverlayOptions;
 import org.fraclab.ui.overlay.ScaleBar;
 import org.fraclab.ui.overlay.ViewInfoLabel;
-import org.fraclab.ui.settings.SettingsDialog;
-import org.fraclab.ui.GoToPositionDialog;
 
+import java.util.List;
+
+/**
+ * Displays the fractal and its overlays, and lets the user pan by dragging and zoom by scrolling.
+ * Owns the fractal settings, and renders again whenever they or the view change.
+ */
 public final class FractalViewController implements AutoCloseable {
     private static final double ZOOM_SPEED = 0.005;
-    private static final Duration RENDER_DEBOUNCE_MS = Duration.millis(150);
+    private static final Duration RENDER_DEBOUNCE = Duration.millis(150);
 
     private final FractalSettings settings = new FractalSettings();
     private final FractalRenderService renderService = new FractalRenderService(new FractalRenderer());
-    private final PauseTransition renderDebounce = new PauseTransition(RENDER_DEBOUNCE_MS);
-    private final SettingsDialog settingsWindow = new SettingsDialog();
-    private final GoToPositionDialog goToPositionDialog = new GoToPositionDialog();
+    private final PauseTransition renderDebounce = new PauseTransition(RENDER_DEBOUNCE);
 
     private Viewport viewport = Viewport.initial();
     private List<Node> panLayers;
@@ -67,74 +64,55 @@ public final class FractalViewController implements AutoCloseable {
 
         fractalPane.setOnMouseMoved(e -> cursorTip.showAt(e.getX(), e.getY(), viewport));
         fractalPane.setOnMouseExited(_ -> cursorTip.hide());
-        fractalPane.setOnMousePressed(e -> { pressX = e.getX(); pressY = e.getY(); });
+        fractalPane.setOnMousePressed(e -> {
+            pressX = e.getX();
+            pressY = e.getY();
+        });
         fractalPane.setOnMouseDragged(e -> setPanOffset(e.getX() - pressX, e.getY() - pressY));
         fractalPane.setOnMouseReleased(e -> finishPan(e.getX() - pressX, e.getY() - pressY));
         fractalPane.setOnScroll(e -> zoomAt(e.getX(), e.getY(), e.getDeltaY()));
     }
 
-    public void onViewReady(Scene scene) {
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, this::handleKeyPressed);
+    /** Shows or hides each overlay according to the options. */
+    public void bindOverlayOptions(OverlayOptions options) {
+        scaleBar.visibleProperty().bind(options.showScaleProperty());
+        // An info label showing nothing would still draw an empty box.
+        infoLabel.visibleProperty().bind(options.showInfoLabelProperty()
+                .and(options.showZoomProperty().or(options.showCenterCoordinatesProperty())));
+        infoLabel.showCenterCoordinatesProperty().bind(options.showCenterCoordinatesProperty());
+        infoLabel.showZoomProperty().bind(options.showZoomProperty());
+        axisOverlay.visibleProperty().bind(options.showAxesProperty());
+    }
+
+    /** Renders the first image. Must be called once the view is laid out at its actual size. */
+    public void start() {
         syncViewportSize();
         render();
     }
 
-    public void showSettings() {
-        settingsWindow.show(fractalPane.getScene().getWindow(), settings);
+    /** The settings of the displayed fractal, which can be edited. */
+    public FractalSettings settings() {
+        return settings;
     }
 
-    public void showGoToPositionDialog() {
-        goToPositionDialog.show(fractalPane.getScene().getWindow(), this);
-    }
-
-    public Viewport getViewport() {
+    public Viewport viewport() {
         return viewport;
     }
 
-    public void goToPosition(double centerX, double centerY, double zoomFactor) {
-        if (!Double.isFinite(centerX) || !Double.isFinite(centerY)
-                || !Double.isFinite(zoomFactor) || zoomFactor <= 0.0) {
-            throw new IllegalArgumentException("Coordinates must be finite and zoom must be greater than zero.");
-        }
-        double heightCp = Viewport.DEFAULT_HEIGHT_CP / zoomFactor;
-        if (!Double.isFinite(heightCp) || heightCp <= 0.0) {
-            throw new IllegalArgumentException("Zoom factor is outside the supported range.");
-        }
+    /** What is currently displayed, as a request to render it again elsewhere. */
+    public RenderRequest renderRequest() {
+        return new RenderRequest(viewport, settings.snapshot());
+    }
+
+    /**
+     * Centers the view on a point of the complex plane at the given zoom factor.
+     *
+     * @throws IllegalArgumentException if the position or zoom factor are invalid.
+     */
+    public void goTo(double real, double imaginary, double zoomFactor) {
         syncViewportSize();
-        viewport = new Viewport(centerX, centerY, viewport.widthPx(), viewport.heightPx(), heightCp);
+        viewport = viewport.centeredAt(real, imaginary, zoomFactor);
         resetPan();
-        render();
-    }
-
-    public void setViewOptions(OverlayOptions overlayOptions) {
-        scaleBar.visibleProperty().bind(overlayOptions.getShowScaleProperty());
-        infoLabel.visibleProperty().bind(overlayOptions.getShowInfoLabelProperty());
-        infoLabel.getShowCenterCoordinatesProperty().bind(overlayOptions.getShowCenterCoordinatesProperty());
-        infoLabel.getShowZoomProperty().bind(overlayOptions.getShowZoomProperty());
-        axisOverlay.visibleProperty().bind(overlayOptions.getShowAxesProperty());
-    }
-
-    private void handleKeyPressed(KeyEvent event) {
-        switch (event.getCode()) {
-            case R -> resetView();
-            case S -> showSettings();
-            default -> { return; }
-        }
-        event.consume();
-    }
-
-    private void finishPan(double dxPx, double dyPx) {
-        if (viewport.isInitial() || (dxPx == 0.0 && dyPx == 0.0)) {
-            resetPan();
-            return;
-        }
-        viewport = viewport.panned(dxPx, dyPx);
-        render();
-    }
-
-    private void zoomAt(double x, double y, double scrollDelta) {
-        if (viewport.isInitial() || scrollDelta == 0.0) return;
-        viewport = viewport.zoomedAt(x, y, Math.exp(scrollDelta * ZOOM_SPEED));
         render();
     }
 
@@ -144,6 +122,24 @@ public final class FractalViewController implements AutoCloseable {
         render();
     }
 
+    private void finishPan(double dxPx, double dyPx) {
+        if (dxPx == 0.0 && dyPx == 0.0) {
+            resetPan();
+            return;
+        }
+        viewport = viewport.panned(dxPx, dyPx);
+        render();
+    }
+
+    private void zoomAt(double x, double y, double scrollDelta) {
+        if (scrollDelta == 0.0) {
+            return;
+        }
+        viewport = viewport.zoomedAt(x, y, Math.exp(scrollDelta * ZOOM_SPEED));
+        render();
+    }
+
+    /** Moves the current image while dragging, until the panned view is rendered. */
     private void setPanOffset(double dxPx, double dyPx) {
         for (Node layer : panLayers) {
             layer.setTranslateX(dxPx);
@@ -164,32 +160,21 @@ public final class FractalViewController implements AutoCloseable {
     }
 
     private void render() {
-        Viewport vp = viewport;
-        infoLabel.update(vp);
-        scaleBar.update(vp);
-        Consumer<WritableImage> onRendered = image -> {
+        renderDebounce.stop();
+        RenderRequest request = renderRequest();
+        Viewport renderedViewport = request.viewport();
+        infoLabel.update(renderedViewport);
+        scaleBar.update(renderedViewport);
+        renderService.render(request, image -> {
             fractalImageView.setImage(image);
             resetPan();
-            axisOverlay.update(vp);
-        };
-        renderService.render(
-                (int) vp.widthPx(), (int) vp.heightPx(),
-                vp.heightCp(),
-                vp.centerXCp(), vp.centerYCp(),
-                settings.snapshot(),
-                onRendered
-        );
-    }
-
-    public FractalViewState getRenderState() {
-        return new FractalViewState(viewport, settings.snapshot());
+            axisOverlay.update(renderedViewport);
+        });
     }
 
     @Override
     public void close() {
         renderDebounce.stop();
-        settingsWindow.close();
-        goToPositionDialog.close();
         renderService.close();
     }
 }

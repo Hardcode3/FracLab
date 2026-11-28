@@ -5,18 +5,18 @@
 
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
-      fx:controller="org.fraclab.ui.GoToPositionDialogController"
-      stylesheets="@GoToPositionDialog.css"
-      styleClass="position-root"
+      fx:controller="org.fraclab.ui.navigation.GoToPositionDialogController"
+      stylesheets="@../Dialog.css, @GoToPositionDialog.css"
+      styleClass="dialog-root, position-root"
       prefWidth="460" minWidth="430">
-    <VBox styleClass="position-hero" spacing="5">
-        <Label text="FRACLAB  /  NAVIGATION" styleClass="position-eyebrow"/>
-        <Label text="Go to a position" styleClass="position-title"/>
-        <Label text="Enter the center and zoom shared with you." styleClass="position-subtitle"/>
+    <VBox styleClass="dialog-hero" spacing="5">
+        <Label text="FRACLAB  /  NAVIGATION" styleClass="dialog-eyebrow"/>
+        <Label text="Go to a position" styleClass="dialog-title"/>
+        <Label text="Enter the center and zoom shared with you." styleClass="dialog-subtitle"/>
     </VBox>
 
-    <VBox styleClass="position-content" spacing="13">
-        <GridPane styleClass="position-form" hgap="14" vgap="12">
+    <VBox styleClass="dialog-content" spacing="13">
+        <GridPane styleClass="dialog-card" hgap="14" vgap="12">
             <columnConstraints>
                 <ColumnConstraints minWidth="125" hgrow="NEVER"/>
                 <ColumnConstraints hgrow="ALWAYS"/>
@@ -29,7 +29,7 @@
             <TextField fx:id="zoomFactorField" promptText="1.0 is the default view" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
         </GridPane>
 
-        <HBox styleClass="position-note" spacing="9" alignment="CENTER_LEFT">
+        <HBox styleClass="dialog-note" spacing="9" alignment="CENTER_LEFT">
             <Label text="i" styleClass="note-icon"/>
             <Label text="Use a comma or period for decimals. Spaces are ignored."
                    styleClass="note-text" wrapText="true"/>
@@ -45,7 +45,7 @@
 
         <HBox spacing="9" alignment="CENTER_RIGHT" styleClass="position-actions">
             <Button text="Cancel" onAction="#cancel" cancelButton="true" styleClass="cancel-button"/>
-            <Button text="Go to position" onAction="#goToPosition" defaultButton="true" styleClass="go-button"/>
+            <Button text="Go to position" onAction="#goToPosition" defaultButton="true" styleClass="primary-button"/>
         </HBox>
     </VBox>
 </VBox>

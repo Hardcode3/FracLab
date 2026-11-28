@@ -1,0 +1,42 @@
+/* Go to position dialog. Shared dialog styles are in ../Dialog.css. */
+
+.position-root .text-field {
+    -fx-background-color: white;
+    -fx-background-radius: 6px;
+    -fx-border-color: #d9e0ed;
+    -fx-border-radius: 6px;
+    -fx-padding: 7px 9px;
+    -fx-font-size: 12px;
+}
+
+.position-root .text-field:focused {
+    -fx-border-color: #5577ca;
+    -fx-effect: dropshadow(gaussian, rgba(41, 79, 168, 0.14), 5, 0, 0, 1);
+}
+
+.validation-message {
+    -fx-background-color: #fff0f0;
+    -fx-background-radius: 7px;
+    -fx-padding: 8px 10px;
+    -fx-font-size: 11px;
+    -fx-text-fill: #a33232;
+}
+
+.position-actions {
+    -fx-padding: 2px 0 0 0;
+}
+
+.cancel-button {
+    -fx-background-color: white;
+    -fx-background-radius: 7px;
+    -fx-border-color: #d9e0ed;
+    -fx-border-radius: 7px;
+    -fx-padding: 8px 13px;
+    -fx-font-size: 11px;
+    -fx-text-fill: #46536c;
+    -fx-cursor: hand;
+}
+
+.cancel-button:hover {
+    -fx-background-color: #f6f8fc;
+}

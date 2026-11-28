@@ -29,9 +29,13 @@ To build bundles for Windows x64, Linux x64, and both Intel and Apple Silicon Ma
 | Package | Responsibility |
 | --- | --- |
 | `org.fraclab.app` | Starts JavaFX and creates the main window. |
-| `org.fraclab.ui` | FXML views and controllers for user interaction. |
-| `org.fraclab.model` | Fractal settings and immutable render configuration. |
+| `org.fraclab.model` | Fractal settings, immutable render configuration, and the viewport mapping screen pixels to the complex plane. |
 | `org.fraclab.fractal` | Mandelbrot and Julia escape-time calculations. |
 | `org.fraclab.render` | Pixel calculation and background render scheduling. |
+| `org.fraclab.export` | Rendering fractals to image files in the background. |
+| `org.fraclab.ui` | Main window controller and helpers shared by the dialogs. |
+| `org.fraclab.ui.*` | One package per part of the interface: the fractal `view` and its `overlay`s, and the `settings`, `navigation`, `export` and `about` dialogs. Their FXML and CSS files sit in the same package under `src/main/resources`. |
 
-The settings form and renderer share a `FractalSettings` model. Each render receives an immutable `RenderSettings` snapshot so background work does not read live JavaFX properties.
+The settings form and renderer share a `FractalSettings` model. Each render receives an immutable `RenderRequest`, made of a `Viewport` and a `RenderSettings` snapshot, so background work does not read live JavaFX properties.
+
+The complex plane follows the mathematical convention: the imaginary axis points up.

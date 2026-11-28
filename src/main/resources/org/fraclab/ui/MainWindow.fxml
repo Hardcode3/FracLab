@@ -7,6 +7,7 @@
 <?import javafx.scene.control.CheckMenuItem?>
 
 <BorderPane
+    fx:id="root"
     fx:controller="org.fraclab.ui.MainWindowController"
     xmlns:fx="http://javafx.com/fxml"
     stylesheets="@MainWindowMenuBar.css">
@@ -25,7 +26,7 @@
                 <MenuItem text="Reset View" onAction="#resetView"/>
                 <Menu text="Overlay">
                     <CheckMenuItem fx:id="showScaleMenuItem" text="Show Scale" selected="true"/>
-                    <CheckMenuItem fx:id="showInfoLabel" text="Show Infos" selected="true"/>
+                    <CheckMenuItem fx:id="showInfoLabelMenuItem" text="Show Infos" selected="true"/>
                     <CheckMenuItem fx:id="showZoomMenuItem" text="Show Zoom" selected="true"/>
                     <CheckMenuItem fx:id="showCenterCoordinatesMenuItem" text="Show Center Coordinates"
                                    selected="true"/>

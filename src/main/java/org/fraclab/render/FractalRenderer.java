@@ -3,6 +3,7 @@ package org.fraclab.render;
 import org.fraclab.fractal.Julia;
 import org.fraclab.fractal.Mandelbrot;
 import org.fraclab.model.RenderSettings;
+import org.fraclab.model.Viewport;
 
 import java.util.concurrent.CancellationException;
 import java.util.function.BooleanSupplier;
@@ -10,50 +11,46 @@ import java.util.stream.IntStream;
 
 /**
  * Computes an image's pixels for various fractals without depending on JavaFX or UI state.
- * Supports parallel execution and cooperative cancellation.
+ * Rows are computed in parallel and the computation can be cancelled cooperatively.
  */
 public final class FractalRenderer {
+    /** How often, in pixels, a row checks whether the render was cancelled. */
+    private static final int CANCELLATION_CHECK_INTERVAL_PX = 128;
+
     /**
-     * Computes a pixel array in row-major order in a background thread using a custom
-     * cancellation supplier for cooperative aborts.
+     * Computes an opaque grayscale ARGB pixel array in row-major order.
      *
-     * @param width Width of the fractal image in pixels.
-     * @param height Height of the fractal image in pixels.
-     * @param viewHeight Height of the fractal image in complex plane units.
-     * @param centerX Center's X coordinate of the fractal image in complex plane units.
-     * @param centerY Center's Y coordinate of the fractal image in complex plane units.
-     * @param settings Settings depicting the fractal being calculated.
-     * @param cancelled A supplier queried periodically to check if the computation should be aborted.
-     * @return An opaque grayscale ARGB pixel array in row-major order.
-     * @throws IllegalArgumentException if dimensions or view height are invalid.
-     * @throws CancellationException if the rendering process is superseded or cancelled.
+     * @param request   The region, pixel size and settings to render.
+     * @param cancelled Queried periodically, from several threads, to abort the computation.
+     * @return The pixels, {@code request.widthPx() * request.heightPx()} of them.
+     * @throws IllegalArgumentException if the image is empty or too large to fit in an array.
+     * @throws CancellationException    if {@code cancelled} reported a cancellation.
      */
-    int[] render(int width, int height, double viewHeight, double centerX, double centerY,
-                 RenderSettings settings, BooleanSupplier cancelled) {
+    public int[] render(RenderRequest request, BooleanSupplier cancelled) {
+        int width = request.widthPx();
+        int height = request.heightPx();
         if (width <= 0 || height <= 0) {
             throw new IllegalArgumentException("Image dimensions must be positive");
         }
-        if (!Double.isFinite(viewHeight) || viewHeight <= 0.0) {
-            throw new IllegalArgumentException("View height must be finite and positive");
+        long pixelCount = (long) width * height;
+        if (pixelCount > Integer.MAX_VALUE - 8) {
+            throw new IllegalArgumentException("Image of " + width + " × " + height + " pixels is too large");
         }
 
-        int[] pixels = new int[Math.multiplyExact(width, height)];
-        double widthRatio = (double) width / height;
-        double xRange = viewHeight * widthRatio;
-        double xMin = centerX - xRange / 2.0;
-        double yMin = centerY - viewHeight / 2.0;
+        Viewport viewport = request.viewport();
+        RenderSettings settings = request.settings();
+        int[] pixels = new int[(int) pixelCount];
 
-        final int CHECK_FOR_CANCEL_EVERY_N_PIXELS = 128;
         IntStream.range(0, height).parallel().forEach(y -> {
             if (cancelled.getAsBoolean()) {
                 return;
             }
-            double imaginary = yMin + (y / (double) height) * viewHeight;
+            double imaginary = viewport.toComplexY(y);
             for (int x = 0; x < width; x++) {
-                if (x % CHECK_FOR_CANCEL_EVERY_N_PIXELS == 0 && cancelled.getAsBoolean()) {
+                if (x % CANCELLATION_CHECK_INTERVAL_PX == 0 && cancelled.getAsBoolean()) {
                     return;
                 }
-                double real = xMin + (x / (double) width) * xRange;
+                double real = viewport.toComplexX(x);
                 double iterations = switch (settings.type()) {
                     case MANDELBROT -> Mandelbrot.iterationCount(real, imaginary, settings);
                     case JULIA -> Julia.iterationCount(real, imaginary, settings);
@@ -70,7 +67,7 @@ public final class FractalRenderer {
     /**
      * Converts a raw iteration count into an opaque grayscale ARGB integer pixel value.
      *
-     * @param iterations The escape iteration count computed for the pixel.
+     * @param iterations    The escape iteration count computed for the pixel.
      * @param maxIterations The maximum allowed iterations used to normalize the value.
      * @return An ARGB integer representing a fully opaque shade of gray.
      */

@@ -1,16 +1,18 @@
-package org.fraclab.ui;
+package org.fraclab.app;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import org.fraclab.ui.MainWindowController;
+
 import java.io.IOException;
 import java.net.URL;
 
-/** Creates and owns the primary application window. */
-public final class MainWindow extends Application {
+/** The JavaFX application: creates and owns the main window. Closing it quits the application. */
+public final class FracLabApp extends Application {
     private static final double INITIAL_WIN_WIDTH_PX = 720;
     private static final double INITIAL_WIN_HEIGHT_PX = 480;
     private static final String WIN_TITLE = "FracLab";
@@ -19,20 +21,20 @@ public final class MainWindow extends Application {
 
     @Override
     public void start(Stage primaryStage) throws IOException {
-        URL resource = getClass().getResource("/org/fraclab/ui/MainWindow.fxml");
-        FXMLLoader loader = new FXMLLoader(resource);
-        Parent root = loader.load();
+        FXMLLoader loader = new FXMLLoader(MainWindowController.class.getResource("MainWindow.fxml"));
+        Scene scene = new Scene(loader.load(), INITIAL_WIN_WIDTH_PX, INITIAL_WIN_HEIGHT_PX);
         mainWindowController = loader.getController();
+        mainWindowController.setHostServices(getHostServices());
 
         primaryStage.setTitle(WIN_TITLE);
-        Scene scene = new Scene(root, INITIAL_WIN_WIDTH_PX, INITIAL_WIN_HEIGHT_PX);
         primaryStage.setScene(scene);
-        primaryStage.setOnShown(_ -> mainWindowController.onViewReady(scene));
-
-        URL logo = getClass().getResource("/org/fraclab/ui/AppLogo.png");
+        URL logo = MainWindowController.class.getResource("AppLogo.png");
         if (logo != null) {
             primaryStage.getIcons().add(new Image(logo.toExternalForm()));
         }
+        primaryStage.setOnShown(_ -> mainWindowController.start());
+        // Dialogs must not keep the application running once the main window is gone.
+        primaryStage.setOnHidden(_ -> Platform.exit());
         primaryStage.show();
     }
 

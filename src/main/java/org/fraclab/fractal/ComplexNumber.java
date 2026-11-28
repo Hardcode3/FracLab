@@ -15,7 +15,9 @@ final class ComplexNumber {
     }
 
     double magnitude() {
-        return Math.hypot(real, imaginary);
+        // Math.hypot guards against overflow, which cannot happen here: points escape long before.
+        // It is also several times slower, and this method runs in the innermost rendering loop.
+        return Math.sqrt(real * real + imaginary * imaginary);
     }
 
     double real() {
