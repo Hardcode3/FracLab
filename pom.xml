@@ -114,12 +114,6 @@
                 <!-- JavaFX loads its native libraries itself; this silences the JDK warning. -->
                 <option>--enable-native-access=javafx.graphics</option>
               </options>
-              <launcher>fraclab</launcher>
-              <jlinkZipName>fraclab</jlinkZipName>
-              <jlinkImageName>fraclab</jlinkImageName>
-              <noManPages>true</noManPages>
-              <stripDebug>true</stripDebug>
-              <noHeaderFiles>true</noHeaderFiles>
             </configuration>
           </execution>
         </executions>
