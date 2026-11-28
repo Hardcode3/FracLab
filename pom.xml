@@ -20,6 +20,7 @@
     <app.name>FracLab</app.name>
     <app.vendor>FracLab</app.vendor>
     <app.description>Explore Mandelbrot and Julia sets</app.description>
+    <app.copyright>Copyright (c) 2026 Baptiste Penot</app.copyright>
     <app.main>org.fraclab/org.fraclab.app.Launcher</app.main>
 
     <!-- Dependency versions -->
@@ -225,6 +226,7 @@
                     <argument>--app-version</argument><argument>${app.version}</argument>
                     <argument>--vendor</argument><argument>${app.vendor}</argument>
                     <argument>--description</argument><argument>${app.description}</argument>
+                    <argument>--copyright</argument><argument>${app.copyright}</argument>
                     <argument>--module-path</argument><argument>${jpackage.dir}/modules</argument>
                     <argument>--module-path</argument><argument>${project.build.directory}/${project.build.finalName}.jar</argument>
                     <argument>--module</argument><argument>${app.main}</argument>
@@ -253,6 +255,8 @@
                     <argument>--app-version</argument><argument>${app.version}</argument>
                     <argument>--vendor</argument><argument>${app.vendor}</argument>
                     <argument>--description</argument><argument>${app.description}</argument>
+                    <argument>--copyright</argument><argument>${app.copyright}</argument>
+                    <argument>--license-file</argument><argument>LICENSE</argument>
                     <argument>@src/packaging/${packaging.os}/installer.args</argument>
                   </arguments>
                 </configuration>

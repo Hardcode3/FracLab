@@ -61,3 +61,7 @@ Pushing a tag such as `v1.2.0` runs the same builds with the version set to `1.2
 The settings form and renderer share a `FractalSettings` model. Each render receives an immutable `RenderRequest`, made of a `Viewport` and a `RenderSettings` snapshot, so background work does not read live JavaFX properties.
 
 The complex plane follows the mathematical convention: the imaginary axis points up.
+
+## License
+
+FracLab is released under the [MIT License](LICENSE).
