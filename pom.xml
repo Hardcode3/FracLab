@@ -23,7 +23,7 @@
     <app.main>org.fraclab/org.fraclab.app.Launcher</app.main>
 
     <!-- Dependency versions -->
-    <javafx.version>21.0.6</javafx.version>
+    <javafx.version>21.0.13.1</javafx.version>
     <junit.version>6.1.3</junit.version>
 
     <!-- Plugin versions -->
