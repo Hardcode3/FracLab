@@ -99,11 +99,6 @@
     -fx-text-fill: #26334d;
 }
 
-.detail-placeholder {
-    -fx-font-size: 10px;
-    -fx-text-fill: #6d7890;
-}
-
 .about-footer {
     -fx-padding: 1px 0 0 0;
 }
