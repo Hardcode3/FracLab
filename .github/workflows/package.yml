@@ -77,12 +77,14 @@ jobs:
       # jpackage names .dmg and .msi files without the platform, so both Mac builds would clash in a release.
       - name: Add the platform to installer file names
         run: |
+          # Patterns that match no file expand to nothing, instead of failing the step.
+          shopt -s nullglob
           cd out
-          archive=$(ls FracLab-*.zip FracLab-*.tar.gz 2>/dev/null | head -n 1)
-          stem=${archive%.zip}
+          archives=(FracLab-*.zip FracLab-*.tar.gz)
+          stem=${archives[0]%.zip}
           stem=${stem%.tar.gz}
           for file in *.dmg *.msi; do
-            [ -e "$file" ] && mv "$file" "$stem.${file##*.}"
+            mv "$file" "$stem.${file##*.}"
           done
           ls -l
 
