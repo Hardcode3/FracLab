@@ -86,8 +86,8 @@
 
                 <Label text="MAINTAINER" styleClass="detail-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                 <Label text="WEBSITE / DOCUMENTATION" styleClass="detail-label" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                <Label text="Hardcode3 (Baptiste Penot)" styleClass="detail-placeholder" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <Label text="github.com/Hardcode3/FracLab" styleClass="detail-placeholder" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Label text="Hardcode3 (Baptiste Penot)" styleClass="detail-value" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Label text="github.com/Hardcode3/FracLab" styleClass="detail-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
 
                 <Separator GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS"/>
                 <Label text="CREDITS &amp; ACKNOWLEDGEMENTS" styleClass="detail-label" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
