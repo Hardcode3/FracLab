@@ -2,7 +2,6 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -86,17 +85,8 @@
 
                 <Label text="MAINTAINER" styleClass="detail-label" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
                 <Label text="WEBSITE / DOCUMENTATION" styleClass="detail-label" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-                <Label text="Hardcode3 (Baptiste Penot)" styleClass="detail-placeholder" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-                <Label text="github.com/Hardcode3/FracLab" styleClass="detail-placeholder" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-
-                <Separator GridPane.rowIndex="4" GridPane.columnIndex="0" GridPane.columnSpan="2" GridPane.hgrow="ALWAYS"/>
-                <Label text="CREDITS &amp; ACKNOWLEDGEMENTS" styleClass="detail-label" GridPane.rowIndex="5" GridPane.columnIndex="0" GridPane.columnSpan="2"/>
-                <Label text="-"
-                       styleClass="detail-placeholder"
-                       wrapText="true"
-                       GridPane.rowIndex="6"
-                       GridPane.columnIndex="0"
-                       GridPane.columnSpan="2"/>
+                <Label text="Hardcode3 (Baptiste Penot)" styleClass="detail-value" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <Label text="github.com/Hardcode3/FracLab" styleClass="detail-value" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
             </GridPane>
         </VBox>
 

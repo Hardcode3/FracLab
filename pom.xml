@@ -18,12 +18,13 @@
 
     <!-- Application metadata, shared by javafx:run and jpackage -->
     <app.name>FracLab</app.name>
-    <app.vendor>FracLab</app.vendor>
+    <app.vendor>Hardcode3</app.vendor>
     <app.description>Explore Mandelbrot and Julia sets</app.description>
+    <app.copyright>Copyright (c) 2026 Baptiste Penot</app.copyright>
     <app.main>org.fraclab/org.fraclab.app.Launcher</app.main>
 
     <!-- Dependency versions -->
-    <javafx.version>21.0.6</javafx.version>
+    <javafx.version>21.0.13.1</javafx.version>
     <junit.version>6.1.3</junit.version>
 
     <!-- Plugin versions -->
@@ -114,12 +115,6 @@
                 <!-- JavaFX loads its native libraries itself; this silences the JDK warning. -->
                 <option>--enable-native-access=javafx.graphics</option>
               </options>
-              <launcher>fraclab</launcher>
-              <jlinkZipName>fraclab</jlinkZipName>
-              <jlinkImageName>fraclab</jlinkImageName>
-              <noManPages>true</noManPages>
-              <stripDebug>true</stripDebug>
-              <noHeaderFiles>true</noHeaderFiles>
             </configuration>
           </execution>
         </executions>
@@ -231,6 +226,7 @@
                     <argument>--app-version</argument><argument>${app.version}</argument>
                     <argument>--vendor</argument><argument>${app.vendor}</argument>
                     <argument>--description</argument><argument>${app.description}</argument>
+                    <argument>--copyright</argument><argument>${app.copyright}</argument>
                     <argument>--module-path</argument><argument>${jpackage.dir}/modules</argument>
                     <argument>--module-path</argument><argument>${project.build.directory}/${project.build.finalName}.jar</argument>
                     <argument>--module</argument><argument>${app.main}</argument>
@@ -259,6 +255,8 @@
                     <argument>--app-version</argument><argument>${app.version}</argument>
                     <argument>--vendor</argument><argument>${app.vendor}</argument>
                     <argument>--description</argument><argument>${app.description}</argument>
+                    <argument>--copyright</argument><argument>${app.copyright}</argument>
+                    <argument>--license-file</argument><argument>LICENSE</argument>
                     <argument>@src/packaging/${packaging.os}/installer.args</argument>
                   </arguments>
                 </configuration>

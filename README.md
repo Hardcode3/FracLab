@@ -2,7 +2,17 @@
 
 A JavaFX application for exploring Mandelbrot and Julia sets.
 
-## Run
+## Install
+
+Download FracLab for your system from the [Releases](https://github.com/Hardcode3/FracLab/releases) page. Java does not need to be installed.
+
+- **macOS:** open the `.dmg` and drag FracLab to Applications. Choose `aarch64` for Apple Silicon Macs and `x86_64` for Intel Macs. The first time, Control-click FracLab and choose **Open**, because the app is not signed.
+- **Windows:** run the `.msi` installer. If SmartScreen warns about an unrecognized app, choose **More info → Run anyway**.
+- **Linux:** install the `.deb` (Debian, Ubuntu) or `.rpm` (Fedora, openSUSE) package.
+
+To use FracLab without installing it, download the `.zip` or `.tar.gz` for your system instead, extract it, and run `FracLab.app`, `FracLab.exe` or `FracLab/bin/FracLab`.
+
+## Run from source
 
 Install JDK 25 or newer and Maven, then run:
 
@@ -61,3 +71,7 @@ Pushing a tag such as `v1.2.0` runs the same builds with the version set to `1.2
 The settings form and renderer share a `FractalSettings` model. Each render receives an immutable `RenderRequest`, made of a `Viewport` and a `RenderSettings` snapshot, so background work does not read live JavaFX properties.
 
 The complex plane follows the mathematical convention: the imaginary axis points up.
+
+## License
+
+FracLab is released under the [MIT License](LICENSE).
